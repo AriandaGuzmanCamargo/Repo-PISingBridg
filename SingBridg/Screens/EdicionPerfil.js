@@ -1,10 +1,13 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions } from 'react-native';
+import React, {useState} from 'react';
+import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions, Modal } from 'react-native';
 
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
 
 export default function EdicionPerfil() {
+
+    const [mostrar, setMostrar] = useState(null);
+
     return (
         <View style={styles.Container}>
             <View style={styles.fondoSuperior}>
@@ -48,11 +51,38 @@ export default function EdicionPerfil() {
             </View>
 
             <View style={styles.fondoInferior}>
-                <Pressable style={styles.Contrasena}>
+                <Pressable style={styles.Contrasena} onPress={() => setMostrar('contra')}>
                     <Text style={styles.textoContra}>Actualiza tu contraseña</Text>
                     <Text style={styles.flecha}> > </Text>
                 </Pressable>
             </View>
+
+
+
+            <Modal
+                transparent={true}
+                animationType="slide"
+                visible={mostrar === 'contra'}
+                onRequestClose={() => setMostrar(null)}
+            >
+                <View style={styles.fondoM}>
+                    <View style={styles.modalContenido}>
+
+                        <Text style={styles.etiqueta2}>Nueva Contraseña:</Text>
+                        <TextInput style={styles.input2} secureTextEntry={true} />
+
+                        <Text style={styles.etiqueta2}>Confirmar Nueva Contraseña:</Text>
+                        <TextInput style={styles.input2} secureTextEntry={true} />
+
+                        <Pressable style={styles.botonConfirmar} onPress={() => setMostrar(null)}>
+                            <Text style={styles.textoBoton}>Actualizar Contraseña</Text>
+                        </Pressable>
+
+                    </View>
+                </View>
+            </Modal>
+
+
         </View>
     );
 }
@@ -222,4 +252,35 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#000',
     },
+    fondoM: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0,0,0,0.0)',
+    },
+
+    modalContenido: {
+        width: '100%',
+        backgroundColor: '#A2BCD6',
+        paddingVertical:30,
+        paddingHorizontal: 20,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
+
+    },
+    etiqueta2: {
+        fontSize: 20,
+        color: '#000',
+        fontWeight: '500',
+        marginBottom: 30,
+        marginTop: 10,
+    },
+    input2: {
+        width: '100%',
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        fontSize: 18,
+    }
+
 });
