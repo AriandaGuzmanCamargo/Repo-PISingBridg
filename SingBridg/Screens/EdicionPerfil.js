@@ -1,0 +1,225 @@
+import React from 'react';
+import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+const ANCHO = width * 0.9;
+
+export default function EdicionPerfil() {
+    return (
+        <View style={styles.Container}>
+            <View style={styles.fondoSuperior}>
+                <View style={styles.header}>
+                    <Text style={styles.titulo}>Edita tu perfil</Text>
+                    <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
+                </View>
+
+                <View style={styles.seccUser}>
+                    <Image
+                        source={require('../assets/image 1.png')}
+                        style={styles.iconoUsuario}
+                        resizeMode="contain"
+                    />
+
+                    <View style={styles.infoUsuario}>
+                        <Text style={styles.textoBienvenida}>Bienvenido Usuario</Text>
+                        <Text style={styles.textoNombre}>Usuario Demo</Text>
+                        <Text style={styles.textoCorreo}>Correo: Usuario.D@gmail.com</Text>
+                    </View>
+                </View>
+            </View>
+
+            <View style={styles.Medio}>
+                <View style={styles.Formulario}>
+                    <Text style={styles.etiqueta}>Nombre:</Text>
+                    <TextInput style={styles.input} />
+
+                    <Text style={[styles.etiqueta, { marginTop: 14 }]}>Correo:</Text>
+                    <TextInput style={styles.input} />
+
+                    <Text style={[styles.etiqueta, { marginTop: 18 }]}>
+                        Ingrese su contraseña para confirmar
+                    </Text>
+                    <TextInput style={[styles.input, { marginTop: 10 }]} secureTextEntry={true} />
+
+                    <Pressable style={styles.botonConfirmar}>
+                        <Text style={styles.textoBoton}>Confirmar</Text>
+                    </Pressable>
+                </View>
+            </View>
+
+            <View style={styles.fondoInferior}>
+                <Pressable style={styles.Contrasena}>
+                    <Text style={styles.textoContra}>Actualiza tu contraseña</Text>
+                    <Text style={styles.flecha}> > </Text>
+                </Pressable>
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    Container: {
+        flex: 1,
+        backgroundColor: '#F4F4F4',
+    },
+    fondoSuperior: {
+        backgroundColor: '#A2BCD6',
+        borderBottomLeftRadius: 50,
+        borderBottomRightRadius: 50,
+        paddingTop: 40,
+        paddingBottom: 30,
+        alignItems: 'center',
+    },
+    fondoInferior: {
+        backgroundColor: '#A2BCD6',
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50,
+        paddingTop: 30,
+        paddingBottom: 40,
+        alignItems: 'center',
+    },
+    Medio: {
+        top: -10,
+        alignItems: 'center',
+        marginVertical: 20,
+        justifyContent: 'center',
+        flex: 1,
+        backgroundColor: '#F4F4F4',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: ANCHO,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 14,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 4,
+        marginBottom: 20,
+    },
+    titulo: {
+        fontSize: 22,
+        fontWeight: '600',
+        color: '#000',
+    },
+    logo: {
+        width: 40,
+        height: 40,
+    },
+    seccUser: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: ANCHO * 0.9,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 4,
+        marginBottom: -2,
+    },
+    iconoUsuario: {
+        width: 56,
+        height: 56,
+        marginRight: 14,
+    },
+    infoUsuario: {
+        flexDirection: 'column',
+    },
+    textoBienvenida: {
+        fontSize: 14,
+        color: '#000',
+        marginBottom: 2,
+    },
+    textoNombre: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#000',
+        marginBottom: 2,
+    },
+    textoCorreo: {
+        fontSize: 12,
+        color: '#777',
+    },
+    Formulario: {
+        width: ANCHO * 0.9,
+        backgroundColor: '#EDEDED',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#555',
+        marginBottom: 100,
+        paddingHorizontal: 18,
+        paddingTop: 18,
+        paddingBottom: 22,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+        elevation: 5,
+    },
+    etiqueta: {
+        fontSize: 16,
+        color: '#000',
+        fontWeight: '500',
+        marginBottom: 10,
+    },
+    input: {
+        width: '100%',
+        backgroundColor: '#D4D4D4',
+        borderRadius: 10,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        fontSize: 18,
+    },
+    botonConfirmar: {
+        marginTop: 20,
+        width: '100%',
+        borderRadius: 14,
+        paddingVertical: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#0057A8',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    textoBoton: {
+        fontSize: 20,
+        color: '#FFFFFF',
+        fontWeight: '600',
+    },
+    Contrasena: {
+        width: ANCHO * 0.9,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 14,
+        paddingHorizontal: 18,
+        paddingVertical: 14,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    textoContra: {
+        fontSize: 16,
+        color: '#000',
+    },
+    flecha: {
+        fontSize: 22,
+        fontWeight: '500',
+        color: '#000',
+    },
+});
