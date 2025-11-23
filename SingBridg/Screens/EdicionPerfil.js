@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions, Modal } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions, Modal, ScrollView } from 'react-native';
+import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
@@ -7,9 +8,15 @@ const ANCHO = width * 0.9;
 export default function EdicionPerfil() {
 
     const [mostrar, setMostrar] = useState(null);
+    const [selectedTab, setSelectedTab] = useState('profile');
+
+    const handleTabChange = (tab) => {
+        setSelectedTab(tab);
+    };
 
     return (
         <View style={styles.Container}>
+            <ScrollView contentContainerStyle={{paddingBottom: 100}}>
             <View style={styles.fondoSuperior}>
                 <View style={styles.header}>
                     <Text style={styles.titulo}>Edita tu perfil</Text>
@@ -56,6 +63,7 @@ export default function EdicionPerfil() {
                     <Text style={styles.flecha}> > </Text>
                 </Pressable>
             </View>
+            </ScrollView>
 
 
 
@@ -82,6 +90,7 @@ export default function EdicionPerfil() {
                 </View>
             </Modal>
 
+            <BarraNavegacionInferior selectedTab={selectedTab} onTabChange={handleTabChange} />
 
         </View>
     );
