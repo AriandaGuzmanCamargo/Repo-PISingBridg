@@ -1,17 +1,19 @@
-//import { StatusBar } from 'expo-status-bar';
-//import { StyleSheet, Text, View } from 'react-native';
-import EdicionPerfil  from "./Screens/EdicionPerfil";
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import Inicio from './Screens/inicio';
+import Login from './Screens/login'; 
+
+const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
-    <EdicionPerfil />
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Inicio" component={Inicio} />
+        <Stack.Screen name="Login" component={Login} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-/*const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});*/
