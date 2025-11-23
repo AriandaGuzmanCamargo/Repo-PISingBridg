@@ -5,13 +5,32 @@ const { width } = Dimensions.get('window');
 export default function Login ({ navigation }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
-    
+    //validacion de formulario
+    const validacion=()=>{
+        if(email.trim()==='' || password.trim()===''){
+            Alert.alert("Error", "Por favor complete todos los campos");
+        }else if(email.trim()===''){
+            Alert.alert("Error", "Por favor ingrese un email");
+        }else if(password.trim()===''){
+            Alert.alert("Error", "Por favor ingrese una contraseña");
+        }else if(!/\S+@\S+\.\S+/.test(email)){
+            Alert.alert("Error", "Por favor ingrese un email válido");
+        }else if(password.length < 6){
+            Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
+        }else{
+            navigation.navigate('Dashboard');
+        }
+    }
     return (
         <View style={styles.container}>
             <View style={styles.titulocontainer}>
+                <Pressable style={styles.botonRegresar} onPress={() => navigation.goBack()}>
+                    <Text style={styles.flechaRegresar}>←</Text>
+                </Pressable>
                 <View style={styles.titulo}>
                     <Text style={styles.textoTitulo}>SingBridge</Text>
                 </View>
+                <View style={styles.espacioVacio}></View>
             </View>
             
             <View style={styles.contTex}>
@@ -29,6 +48,8 @@ export default function Login ({ navigation }) {
                             placeholder='ejemplo@gmail.com'
                             placeholderTextColor='#999'
                             keyboardType='email-address'
+                            value={email}
+                            onChangeText={setEmail}
 
                         />
                     </View>
@@ -42,13 +63,15 @@ export default function Login ({ navigation }) {
                             placeholder='••••••••'
                             placeholderTextColor='#999'
                             secureTextEntry={true}
+                            value={password}
+                            onChangeText={setPassword}
                         />
                     </View>
                     
                     <Pressable style={styles.olvidoContra}>
                         <Text style={styles.textoOlvido}>¿Olvidaste tu contraseña?</Text>
                     </Pressable>
-                    <Pressable style={styles.botonIniciar}>
+                    <Pressable style={styles.botonIniciar} onPress={validacion}>
                         <Text style={styles.textoBotonIniciar}>Iniciar Sesión</Text>
                     </Pressable>
                     
@@ -68,9 +91,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#1F3A5F',
         fontWeight: '700',
         height: 80,
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
         borderRadius: 10,
+    },
+    botonRegresar: {
+        padding: 5,
+    },
+    flechaRegresar: {
+        fontSize: 30,
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+    },
+    titulo: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    espacioVacio: {
+        width: 40,
     },
     textoTitulo: {
         fontFamily:'Times New Roman',
