@@ -25,7 +25,7 @@ export default function Inicio({ navigation }) {
                             <Text style={styles.textoBoton}>Iniciar Sesión</Text>
                         </Pressable>
 
-                        <Pressable style={styles.botonConfirmar}>
+                        <Pressable style={styles.botonConfirmar} onPress={() => navigation.navigate('Registro')}>
                             <Text style={styles.textoBoton}>Registrarse</Text>
                         </Pressable>
 
