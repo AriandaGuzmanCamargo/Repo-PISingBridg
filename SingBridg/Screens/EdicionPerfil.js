@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions, Modal, ScrollView, Alert } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
 const { width } = Dimensions.get('window');
@@ -10,8 +10,83 @@ export default function EdicionPerfil() {
     const [mostrar, setMostrar] = useState(null);
     const [selectedTab, setSelectedTab] = useState('profile');
 
+
+    const [nombre, setNombre] = useState('');
+    const [correo, setCorreo] = useState('');
+    const [contrasena, setContrasena] = useState('');
+
+    const [nuevaContrasena, setNuevaContrasena] = useState('');
+    const [confirmarContrasena, setConfirmarContrasena] = useState('');
+
     const handleTabChange = (tab) => {
         setSelectedTab(tab);
+    };
+
+    const validarFormulario = () => {
+        if (!nombre.trim() && !correo.trim() && !contrasena.trim()) {
+            Alert.alert('Error', 'Por favor, completa todos los campos');
+            return false;
+        }
+
+        if (!nombre.trim()) {
+            Alert.alert('Error', 'Por favor, ingresa tu nombre');
+            return false;
+        }
+
+        if (!correo.trim()) {
+            Alert.alert('Error', 'Por favor, ingresa tu correo');
+            return false;
+        }
+
+        if (!contrasena.trim()) {
+            Alert.alert('Error', 'Por favor, ingresa tu contraseña para confirmar');
+            return false;
+        }
+
+        return true;
+    };
+
+    const validarCambioContrasena = () => {
+        if (!nuevaContrasena.trim() && !confirmarContrasena.trim()) {
+            Alert.alert('Error', 'Por favor, completa ambos campos de contraseña');
+            return false;
+        }
+
+        if (!nuevaContrasena.trim()) {
+            Alert.alert('Error', 'Por favor, ingresa la nueva contraseña');
+            return false;
+        }
+
+        if (!confirmarContrasena.trim()) {
+            Alert.alert('Error', 'Por favor, confirma la nueva contraseña');
+            return false;
+        }
+
+        if (nuevaContrasena !== confirmarContrasena) {
+            Alert.alert('Error', 'Las contraseñas no coinciden');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleConfirmar = () => {
+        if (validarFormulario()) {
+            Alert.alert('Éxito', 'Perfil actualizado correctamente');
+            console.log('Formulario válido', { nombre, correo });
+            setNombre('');
+            setCorreo('');
+            setContrasena('');
+        }
+    };
+
+    const handleActualizarContrasena = () => {
+        if (validarCambioContrasena()) {
+            Alert.alert('Éxito', 'Contraseña actualizada correctamente');
+            setNuevaContrasena('');
+            setConfirmarContrasena('');
+            setMostrar(null);
+        }
     };
 
     return (
@@ -41,17 +116,35 @@ export default function EdicionPerfil() {
             <View style={styles.Medio}>
                 <View style={styles.Formulario}>
                     <Text style={styles.etiqueta}>Nombre:</Text>
-                    <TextInput style={styles.input} />
+                    <TextInput
+                        style={styles.input}
+                        value={nombre}
+                        onChangeText={setNombre}
+                        placeholder="Ingresa tu nombre"
+                    />
 
                     <Text style={[styles.etiqueta, { marginTop: 14 }]}>Correo:</Text>
-                    <TextInput style={styles.input} />
+                    <TextInput
+                        style={styles.input}
+                        value={correo}
+                        onChangeText={setCorreo}
+                        placeholder="Ingresa tu correo"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
 
                     <Text style={[styles.etiqueta, { marginTop: 18 }]}>
                         Ingrese su contraseña para confirmar
                     </Text>
-                    <TextInput style={[styles.input, { marginTop: 10 }]} secureTextEntry={true} />
+                    <TextInput
+                        style={[styles.input, { marginTop: 10 }]}
+                        secureTextEntry={true}
+                        value={contrasena}
+                        onChangeText={setContrasena}
+                        placeholder="Contraseña actual"
+                    />
 
-                    <Pressable style={styles.botonConfirmar}>
+                    <Pressable style={styles.botonConfirmar} onPress={handleConfirmar}>
                         <Text style={styles.textoBoton}>Confirmar</Text>
                     </Pressable>
                 </View>
@@ -77,12 +170,24 @@ export default function EdicionPerfil() {
                     <View style={styles.modalContenido}>
 
                         <Text style={styles.etiqueta2}>Nueva Contraseña:</Text>
-                        <TextInput style={styles.input2} secureTextEntry={true} />
+                        <TextInput
+                            style={styles.input2}
+                            secureTextEntry={true}
+                            value={nuevaContrasena}
+                            onChangeText={setNuevaContrasena}
+                            placeholder="Ingresa nueva contraseña"
+                        />
 
                         <Text style={styles.etiqueta2}>Confirmar Nueva Contraseña:</Text>
-                        <TextInput style={styles.input2} secureTextEntry={true} />
+                        <TextInput
+                            style={styles.input2}
+                            secureTextEntry={true}
+                            value={confirmarContrasena}
+                            onChangeText={setConfirmarContrasena}
+                            placeholder="Confirma tu contraseña"
+                        />
 
-                        <Pressable style={styles.botonConfirmar} onPress={() => setMostrar(null)}>
+                        <Pressable style={styles.botonConfirmar} onPress={handleActualizarContrasena}>
                             <Text style={styles.textoBoton}>Actualizar Contraseña</Text>
                         </Pressable>
 
