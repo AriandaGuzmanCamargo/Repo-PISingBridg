@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
+import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
@@ -11,6 +12,40 @@ const COLORES = {
     grisClaro: '#e4e4e4ff',
 };
 
+// Abecedario completo
+const ABECEDARIO = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+// Vocabulario por letra
+const VOCABULARIO_POR_LETRA = {
+    'A': ['Agua', 'Abrir', 'Alto', 'Ayuda', 'Apetito', 'Amigo', 'Adiós'],
+    'B': ['Bueno', 'Baño', 'Bebé', 'Beber', 'Beso', 'Blanco', 'Bonito'],
+    'C': ['Casa', 'Comer', 'Calor', 'Caminar', 'Cansado', 'Carro', 'Cielo'],
+    'D': ['Día', 'Dolor', 'Dormir', 'Dulce', 'Dinero', 'Diente', 'Derecha'],
+    'E': ['Escuela', 'Enfermo', 'Esperar', 'Estudiar', 'Escribir', 'Escuchar', 'Estrella'],
+    'F': ['Familia', 'Feliz', 'Frío', 'Fuego', 'Fácil', 'Feo', 'Fuerte'],
+    'G': ['Gracias', 'Grande', 'Gato', 'Gustar', 'Gente', 'Guerra', 'Gobierno'],
+    'H': ['Hola', 'Hermano', 'Hambre', 'Hablar', 'Hijo', 'Hermoso', 'Hombre'],
+    'I': ['Iglesia', 'Importante', 'Igual', 'Idea', 'Idioma', 'Ir', 'Izquierda'],
+    'J': ['Jugar', 'Joven', 'Junto', 'Justo', 'Jardín', 'Juego', 'Juntos'],
+    'K': ['Kilo', 'Kilómetro'],
+    'L': ['Luz', 'Lejos', 'Leer', 'Lento', 'Largo', 'Libro', 'Lindo'],
+    'M': ['Mamá', 'Mañana', 'Más', 'Mejor', 'Menor', 'Mesa', 'Mucho'],
+    'N': ['Niño', 'Noche', 'Nombre', 'Nuevo', 'Nunca', 'Negro', 'Nadie'],
+    'Ñ': ['Año', 'Niño', 'Señor', 'Mañana'],
+    'O': ['Otro', 'Oír', 'Ojo', 'Olvidar', 'Oro', 'Oscuro', 'Obra'],
+    'P': ['Papá', 'Pequeño', 'Poder', 'Pedir', 'Pensar', 'Palabra', 'Perder'],
+    'Q': ['Querer', 'Quedar', 'Quién', 'Qué', 'Quieto', 'Quitar', 'Queso'],
+    'R': ['Rápido', 'Recordar', 'Rojo', 'Responder', 'Reír', 'Rico', 'Río'],
+    'S': ['Salir', 'Saber', 'Sentir', 'Ser', 'Señor', 'Siempre', 'Solo'],
+    'T': ['Tiempo', 'Tener', 'Trabajo', 'Triste', 'Todo', 'Tarde', 'Tierra'],
+    'U': ['Último', 'Único', 'Usar', 'Útil', 'Uno', 'Unidos', 'Universidad'],
+    'V': ['Ver', 'Verdad', 'Verde', 'Vestir', 'Vez', 'Viejo', 'Vivir'],
+    'W': ['Water'],
+    'X': ['Xilófono'],
+    'Y': ['Yo', 'Ya'],
+    'Z': ['Zapato', 'Zona', 'Zoológico'],
+};
+
 
 const ItemVocabulario = ({ palabra, alPresionar }) => (
     <Pressable style={styles.contenedorItem} onPress={alPresionar}>
@@ -20,15 +55,29 @@ const ItemVocabulario = ({ palabra, alPresionar }) => (
 );
 
 export default function vocabulario({ navigation }) {
-    const datosVocabulario = [
-        'Agua',
-        'Abrir',
-        'Alto',
-        'Ayuda',
-        'Apetito',
-        'Amigo',
-        'Adiós',
-    ];
+    const [indiceLetra, setIndiceLetra] = useState(0); // Índice de la letra actual
+    const [selectedTab, setSelectedTab] = useState('home');
+    
+    const letraActual = ABECEDARIO[indiceLetra];
+    const palabrasActuales = VOCABULARIO_POR_LETRA[letraActual] || [];
+
+    const handleTabChange = (tab) => {
+        setSelectedTab(tab);
+    };
+
+    // Navegar a la letra anterior
+    const irLetraAnterior = () => {
+        if (indiceLetra > 0) {
+            setIndiceLetra(indiceLetra - 1);
+        }
+    };
+
+    // Navegar a la letra siguiente
+    const irLetraSiguiente = () => {
+        if (indiceLetra < ABECEDARIO.length - 1) {
+            setIndiceLetra(indiceLetra + 1);
+        }
+    };
 
     const manejarDetallePalabra = (palabra) => {
         console.log(`Navegando al detalle de: ${palabra}`);
@@ -36,28 +85,42 @@ export default function vocabulario({ navigation }) {
     };
 
     return(
-        <SafeAreaView style={styles.contenedorPrincipal}>
-            {/* Cabecera (Adaptado) */}
+        <View style={styles.contenedorPrincipal}>
+            {/* Cabecera */}
             <View style={styles.cabecera}>
                 <Pressable onPress={() => navigation.goBack()} style={styles.iconoBackContainer}>
                     <Text style={styles.textoIconoNav}>{'<'}</Text>
                 </Pressable>
-                <Text style={styles.tituloCabecera}>LETRA A</Text>
-                <Pressable onPress={() => {/* Navegar a Ajustes */}} style={styles.iconoAjustesContainer}>
-                    <Text style={styles.textoIconoNav}>{'⛭'}</Text>
-                </Pressable>
+                <Text style={styles.tituloCabecera}>LETRA {letraActual}</Text>
+                <View style={styles.iconoAjustesContainer}>
+                    <Text style={styles.textoIconoNav}> </Text>
+                </View>
             </View>
 
           
-            <ScrollView style={styles.vistaDesplazableContenido}>
+            <ScrollView style={styles.vistaDesplazableContenido} contentContainerStyle={styles.scrollContent}>
                 
               
                 <View style={styles.navegacionLetra}>
-                    <Pressable style={styles.botonNavLetra}>
+                    <Pressable 
+                        style={[
+                            styles.botonNavLetra, 
+                            indiceLetra === 0 && styles.botonDeshabilitado
+                        ]}
+                        onPress={irLetraAnterior}
+                        disabled={indiceLetra === 0}
+                    >
                         <Text style={styles.textoNavLetra}>{'<'}</Text>
                     </Pressable>
-                    <Text style={styles.letraActual}>A</Text>
-                    <Pressable style={styles.botonNavLetra}>
+                    <Text style={styles.letraActual}>{letraActual}</Text>
+                    <Pressable 
+                        style={[
+                            styles.botonNavLetra,
+                            indiceLetra === ABECEDARIO.length - 1 && styles.botonDeshabilitado
+                        ]}
+                        onPress={irLetraSiguiente}
+                        disabled={indiceLetra === ABECEDARIO.length - 1}
+                    >
                         <Text style={styles.textoNavLetra}>{'>'}</Text>
                     </Pressable>
                 </View>
@@ -66,24 +129,31 @@ export default function vocabulario({ navigation }) {
 
                
                 <View style={styles.contenedorLista}>
-                    {datosVocabulario.map((palabra, indice) => (
-                        <ItemVocabulario 
-                            key={indice} 
-                            palabra={palabra} 
-                            alPresionar={() => manejarDetallePalabra(palabra)}
-                        />
-                    ))}
+                    {palabrasActuales.length > 0 ? (
+                        palabrasActuales.map((palabra, indice) => (
+                            <ItemVocabulario 
+                                key={indice} 
+                                palabra={palabra} 
+                                alPresionar={() => manejarDetallePalabra(palabra)}
+                            />
+                        ))
+                    ) : (
+                        <View style={styles.sinPalabras}>
+                            <Text style={styles.textoSinPalabras}>
+                                No hay palabras disponibles para esta letra
+                            </Text>
+                        </View>
+                    )}
                 </View>
 
             </ScrollView>
             
-            
-            <View style={styles.piePagina}>
-                <Text style={styles.iconoPie}>⚙️</Text>
-                <Text style={styles.iconoPie}>🏠</Text>
-                <Text style={styles.iconoPie}>👤</Text>
-            </View>
-        </SafeAreaView>
+            {/* Barra de navegación inferior */}
+            <BarraNavegacionInferior 
+                selectedTab={selectedTab} 
+                onTabChange={handleTabChange}
+            />
+        </View>
     );
 }
 
@@ -121,6 +191,9 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 15,
     },
+    scrollContent: {
+        paddingBottom: 100,
+    },
     
     
     navegacionLetra: {
@@ -140,6 +213,10 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    botonDeshabilitado: {
+        backgroundColor: '#94A3B8',
+        opacity: 0.5,
     },
     textoNavLetra: {
         color: COLORES.blanco,
@@ -185,16 +262,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: COLORES.azulFuerte,
     },
-
-    piePagina: {
-        backgroundColor: COLORES.azulFuerte,
-        height: 60,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
+    sinPalabras: {
+        padding: 30,
         alignItems: 'center',
     },
-    iconoPie: {
-        fontSize: 28,
-        color: COLORES.blanco,
+    textoSinPalabras: {
+        fontSize: 16,
+        color: '#999',
+        textAlign: 'center',
     },
 });
