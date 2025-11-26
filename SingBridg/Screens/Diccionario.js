@@ -34,10 +34,15 @@ const data = [
 
 export default function Diccionario({ navigation }) {
 
-const [selectedTab, setSelectedTab] = useState('home');
+    const [selectedTab, setSelectedTab] = useState('home');
 
-const handleTabChange = (tab) => {
-    setSelectedTab(tab);
+    const handleTabChange = (tab) => {
+        setSelectedTab(tab);
+        if (tab === 'settings') {
+            navigation.navigate('Configuracion');
+        } else if (tab === 'profile') {
+            navigation.navigate('EdicionPerfil');
+        }
     };
 
     const renderItem = ({ item }) => (
@@ -72,8 +77,10 @@ const handleTabChange = (tab) => {
                 />
             </View>
 
-            <BarraNavegacionInferior selectedTab={selectedTab} onTabChange={handleTabChange} />
-
+            <BarraNavegacionInferior 
+                selectedTab={selectedTab} 
+                onTabChange={handleTabChange} 
+            />
         </View>
     );
 }
@@ -121,7 +128,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     listContent: {
-        paddingBottom: 120,
+        paddingBottom: 100, 
     },
     columnWrapper: {
         justifyContent: 'flex-start', 
