@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
 const { width } = Dimensions.get('window');
@@ -54,9 +54,18 @@ const ItemVocabulario = ({ palabra, alPresionar }) => (
     </Pressable>
 );
 
-export default function vocabulario({ navigation }) {
-    const [indiceLetra, setIndiceLetra] = useState(0); // Índice de la letra actual
+export default function vocabulario({ navigation, route }) {
+    // Recibir el índice de letra desde los parámetros de navegación
+    const indiceInicial = route.params?.indiceLetra ?? 0;
+    const [indiceLetra, setIndiceLetra] = useState(indiceInicial);
     const [selectedTab, setSelectedTab] = useState('home');
+    
+    // Actualizar el índice si cambian los parámetros
+    useEffect(() => {
+        if (route.params?.indiceLetra !== undefined) {
+            setIndiceLetra(route.params.indiceLetra);
+        }
+    }, [route.params?.indiceLetra]);
     
     const letraActual = ABECEDARIO[indiceLetra];
     const palabrasActuales = VOCABULARIO_POR_LETRA[letraActual] || [];
@@ -86,14 +95,14 @@ export default function vocabulario({ navigation }) {
 
     return(
         <View style={styles.contenedorPrincipal}>
-            {/* Cabecera */}
-            <View style={styles.cabecera}>
-                <Pressable onPress={() => navigation.goBack()} style={styles.iconoBackContainer}>
-                    <Text style={styles.textoIconoNav}>{'<'}</Text>
-                </Pressable>
-                <Text style={styles.tituloCabecera}>LETRA {letraActual}</Text>
-                <View style={styles.iconoAjustesContainer}>
-                    <Text style={styles.textoIconoNav}> </Text>
+            {/* Header tipo Diccionario */}
+            <View style={styles.headerContainer}>
+                <View style={styles.headerCard}>
+                    <Pressable onPress={() => navigation.goBack()} style={styles.botonAtras}>
+                        <Text style={styles.textoBotonAtras}>←</Text>
+                    </Pressable>
+                    <Text style={styles.headerTitle}>Vocabulario - Letra {letraActual}</Text>
+                    <Image source={require('../assets/Logo.png')} style={styles.headerLogo} />
                 </View>
             </View>
 
@@ -162,30 +171,43 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORES.grisClaro,
     },
-   
-    cabecera: {
-        backgroundColor: COLORES.azulFuerte,
-        height: 60,
+    headerContainer: {
+        paddingTop: 50, 
+        paddingHorizontal: 20,
+        marginBottom: 10,
+    },
+    headerCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 15,
+        paddingVertical: 20,
+        paddingHorizontal: 20,
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 15,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
-    tituloCabecera: {
-        fontWeight: '700',
-        fontSize: 18,
-        color: COLORES.blanco,
-    },
-    iconoBackContainer: {
+    botonAtras: {
         padding: 5,
+        marginRight: 10,
     },
-    iconoAjustesContainer: {
-        padding: 5,
-    },
-    textoIconoNav: {
-        fontSize: 24,
+    textoBotonAtras: {
+        fontSize: 28,
+        color: '#000',
         fontWeight: 'bold',
-        color: COLORES.blanco,
+    },
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: '600',
+        color: '#000',
+    },
+    headerLogo: {
+        width: 40,
+        height: 40,
+        resizeMode: 'contain',
     },
     vistaDesplazableContenido: {
         flex: 1,

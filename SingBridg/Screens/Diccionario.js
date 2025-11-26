@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, View, Image, FlatList } from 'react-native';
+import { Text, StyleSheet, View, Image, FlatList, Pressable } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
 const data = [
@@ -45,21 +45,34 @@ export default function Diccionario({ navigation }) {
         }
     };
 
+    // Función para navegar al vocabulario con la letra seleccionada
+    const irAVocabulario = (letra) => {
+        // Encontrar el índice de la letra en el abecedario
+        const ABECEDARIO = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        const indice = ABECEDARIO.indexOf(letra);
+        
+        // Navegar a vocabulario con el índice de la letra
+        navigation.navigate('vocabulario', { indiceLetra: indice >= 0 ? indice : 0 });
+    };
+
     const renderItem = ({ item }) => (
-        <View style={styles.itemContainer}>
+        <Pressable style={styles.itemContainer} onPress={() => irAVocabulario(item.letter)}>
             <View style={styles.imageWrapper}>
                 <Image source={item.img} style={styles.signImage} />
             </View>
             <View style={styles.letterContainer}>
                 <Text style={styles.letterText}>{item.letter}</Text>
             </View>
-        </View>
+        </Pressable>
     );
 
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <View style={styles.headerCard}>
+                    <Pressable onPress={() => navigation.goBack()} style={styles.botonAtras}>
+                        <Text style={styles.textoBotonAtras}>←</Text>
+                    </Pressable>
                     <Text style={styles.headerTitle}>Diccionario</Text>
                     <Image source={require('../assets/Logo.png')} style={styles.headerLogo} />
                 </View>
@@ -100,8 +113,9 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center', 
+        justifyContent: 'space-between', 
         paddingVertical: 15,
+        paddingHorizontal: 20,
         position: 'relative', 
         elevation: 3, 
         shadowColor: '#000', 
@@ -109,11 +123,20 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
     },
+    botonAtras: {
+        padding: 5,
+    },
+    textoBotonAtras: {
+        fontSize: 28,
+        color: '#000',
+        fontWeight: 'bold',
+    },
     headerTitle: {
         fontFamily: 'Times New Roman',
         fontSize: 22,
         fontWeight: 'bold',
         color: '#333333',
+        flex: 1,
         textAlign: 'center',
     },
     headerLogo: {
