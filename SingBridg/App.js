@@ -9,6 +9,9 @@ import Registro from './Screens/registro';
 import Configuracion from './Screens/configuracion';
 import EdicionPerfil from './Screens/EdicionPerfil';
 import Diccionario from './Screens/Diccionario';
+import vocabulario from './Screens/vocabulario';
+import DetalleLetra from './Screens/DetalleLetra';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +26,8 @@ export default function App() {
         <Stack.Screen name="Configuracion" component={Configuracion} />
         <Stack.Screen name="EdicionPerfil" component={EdicionPerfil} />
         <Stack.Screen name="Diccionario" component={Diccionario} />
+        <Stack.Screen name="vocabulario" component={vocabulario} />
+        <Stack.Screen name="DetalleLetra" component={DetalleLetra} />
       </Stack.Navigator>
     </NavigationContainer>
   );

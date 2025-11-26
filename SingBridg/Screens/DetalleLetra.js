@@ -4,26 +4,24 @@ import { View, Text, StyleSheet, Image, Pressable, Dimensions, SafeAreaView } fr
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
 
-// --- Colores Consistentes ---
+
 const COLORES = {
-  azulFuerte: '#1F3A5F', // Titulo y botones principales
-  azulIntermedio: '#A2BCD6', // Fondo del pie de página en el inicio, lo usaremos para secciones claras
-  azulClaro: '#004A93', // Botón principal (Iniciar Sesión)
-  fondoGeneral: '#e4e4e4ff', // Fondo general
+  azulFuerte: '#1F3A5F', 
+  azulIntermedio: '#A2BCD6',  
+  azulClaro: '#004A93', 
+  fondoGeneral: '#e4e4e4ff', 
 };
 
 export default function PantallaDetalleLetra({ navigation }) {
-    // Datos de ejemplo para la letra 'A'
+    
     const datosLetra = {
         letra: 'A',
         descripcion: 'Con la mano cerrada, se muestran las uñas y se estira el dedo pulgar hacia un lado. La palma mira al frente.',
-        // Nota: Debes asegurar que la imagen exista en tu carpeta assets
-        imagenSenia: require('../assets/letra_a_sign.png'), 
+        imagenSenia: require('../assets/A.jpg'), 
     };
 
     return(
         <SafeAreaView style={styles.contenedorPrincipal}>
-            {/* Cabecera (Similar a titulocontainer pero con iconos) */}
             <View style={styles.cabecera}>
                 <Pressable onPress={() => navigation.goBack()} style={styles.iconoBackContainer}>
                     <Text style={styles.textoIconoNav}>{'<'}</Text>
@@ -82,7 +80,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORES.fondoGeneral,
     },
-    // --- Cabecera de la Pantalla (Adaptado de titulocontainer) ---
     cabecera: {
         backgroundColor: COLORES.azulFuerte,
         height: 60,
@@ -113,7 +110,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
     
-    // --- Navegación de Letra (Recuadro Azul Claro) ---
+    
     navegacionLetra: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -143,7 +140,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 
-    // --- Tarjeta de Contenido ---
     tarjetaSeña: {
         width: ANCHO * 0.95,
         backgroundColor: COLORES.blanco,
@@ -151,7 +147,7 @@ const styles = StyleSheet.create({
         padding: 20,
         marginTop: 15,
         alignItems: 'center',
-        height: '70%', // Ocupa gran parte del espacio disponible
+        height: '70%', 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
@@ -171,14 +167,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingHorizontal: 10,
     },
-    
-    // --- Botón de Vocabulario (Adaptado de botonConfirmar) ---
+
     botonVocabulario: {
         backgroundColor: COLORES.azulFuerte,
         paddingVertical: 12,
         paddingHorizontal: 40,
         borderRadius: 18,
-        marginTop: 'auto', // Lo empuja hacia abajo en la tarjeta
+        marginTop: 'auto', 
         width: '90%',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -193,7 +188,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // --- Pie de Página (Footer) ---
     piePagina: {
         backgroundColor: COLORES.azulFuerte,
         height: 60,

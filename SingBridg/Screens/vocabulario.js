@@ -4,15 +4,14 @@ import { View, Text, StyleSheet, Pressable, Dimensions, SafeAreaView, ScrollView
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
 
-// --- Colores Consistentes ---
 const COLORES = {
-    azulFuerte: '#1F3A5F', // Titulo y pie de página
-    azulIntermedio: '#A2BCD6', // Recuadro de navegación de letra
-    blanco: '#ffffff', // Fondo de tarjeta
-    grisClaro: '#e4e4e4ff', // Fondo general
+    azulFuerte: '#1F3A5F', 
+    azulIntermedio: '#A2BCD6', 
+    blanco: '#ffffff', 
+    grisClaro: '#e4e4e4ff',
 };
 
-// --- Componente de Fila de Vocabulario ---
+
 const ItemVocabulario = ({ palabra, alPresionar }) => (
     <Pressable style={styles.contenedorItem} onPress={alPresionar}>
         <Text style={styles.textoPalabra}>{palabra}</Text>
@@ -21,7 +20,6 @@ const ItemVocabulario = ({ palabra, alPresionar }) => (
 );
 
 export default function vocabulario({ navigation }) {
-    // Datos de ejemplo
     const datosVocabulario = [
         'Agua',
         'Abrir',
@@ -50,10 +48,10 @@ export default function vocabulario({ navigation }) {
                 </Pressable>
             </View>
 
-            {/* Contenido Principal */}
+          
             <ScrollView style={styles.vistaDesplazableContenido}>
                 
-                {/* Sección de Navegación de Letra (Recuadro azul claro) */}
+              
                 <View style={styles.navegacionLetra}>
                     <Pressable style={styles.botonNavLetra}>
                         <Text style={styles.textoNavLetra}>{'<'}</Text>
@@ -66,7 +64,7 @@ export default function vocabulario({ navigation }) {
 
                 <Text style={styles.tituloLista}>Interfaz del vocabulario básico</Text>
 
-                {/* Lista de Vocabulario */}
+               
                 <View style={styles.contenedorLista}>
                     {datosVocabulario.map((palabra, indice) => (
                         <ItemVocabulario 
@@ -79,7 +77,7 @@ export default function vocabulario({ navigation }) {
 
             </ScrollView>
             
-            {/* Barra de Navegación Inferior (Footer) */}
+            
             <View style={styles.piePagina}>
                 <Text style={styles.iconoPie}>⚙️</Text>
                 <Text style={styles.iconoPie}>🏠</Text>
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORES.grisClaro,
     },
-    // --- Cabecera de la Pantalla ---
+   
     cabecera: {
         backgroundColor: COLORES.azulFuerte,
         height: 60,
@@ -124,7 +122,7 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     
-    // --- Navegación de Letra (Recuadro Azul Claro) ---
+    
     navegacionLetra: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -154,7 +152,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     
-    // --- Lista de Vocabulario ---
     tituloLista: {
         fontSize: 16,
         color: '#666',
@@ -189,7 +186,6 @@ const styles = StyleSheet.create({
         color: COLORES.azulFuerte,
     },
 
-    // --- Pie de Página (Footer) ---
     piePagina: {
         backgroundColor: COLORES.azulFuerte,
         height: 60,
