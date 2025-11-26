@@ -8,6 +8,7 @@ import Dashboard from './Screens/dashboard';
 import Registro from './Screens/registro';
 import Configuracion from './Screens/configuracion';
 import EdicionPerfil from './Screens/EdicionPerfil';
+import Diccionario from './Screens/Diccionario';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Screen name="Registro" component={Registro} />
         <Stack.Screen name="Configuracion" component={Configuracion} />
         <Stack.Screen name="EdicionPerfil" component={EdicionPerfil} />
+        <Stack.Screen name="Diccionario" component={Diccionario} />
       </Stack.Navigator>
     </NavigationContainer>
   );
