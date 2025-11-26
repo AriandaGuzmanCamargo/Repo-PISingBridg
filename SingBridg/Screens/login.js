@@ -1,44 +1,71 @@
-import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert, Modal } from 'react-native'
-import React, { useState } from 'react'
+import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert, Modal, ActivityIndicator } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { AuthController } from '../controllers/AuthController'
+import { initDatabase } from '../database/database'
 
 const { width } = Dimensions.get('window');
 export default function Login ({ navigation }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [cargando, setCargando] = React.useState(false);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [recoverEmail, setRecoverEmail] = useState('');
 
-    //validacion de formulario
-    const validacion=()=>{
-        if(email.trim()==='' || password.trim()===''){
-            Alert.alert("Error", "Por favor complete todos los campos");
-        }else if(email.trim()===''){
-            Alert.alert("Error", "Por favor ingrese un email");
-        }else if(password.trim()===''){
-            Alert.alert("Error", "Por favor ingrese una contraseña");
-        }else if(!/\S+@\S+\.\S+/.test(email)){
-            Alert.alert("Error", "Por favor ingrese un email válido");
-        }else if(password.length < 6){
-            Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
-        }else{
-            navigation.navigate('Dashboard');
+    // Inicializar la base de datos cuando se carga el componente
+    useEffect(() => {
+        initDatabase()
+            .then(() => console.log('Base de datos inicializada en Login'))
+            .catch(error => console.error('Error al inicializar BD:', error));
+    }, []);
+
+    //validacion de formulario y login
+    const validacion = async () => {
+        setCargando(true);
+        
+        try {
+            const resultado = await AuthController.iniciarSesion(email, password);
+            
+            if (resultado.exito) {
+                // Limpiar formulario
+                setEmail('');
+                setPassword('');
+                // Navegar al Dashboard
+                navigation.navigate('Dashboard');
+            } else {
+                Alert.alert("Error", resultado.mensaje);
+            }
+        } catch (error) {
+            console.error('Error en login:', error);
+            Alert.alert("Error", "Ocurrió un error al iniciar sesión. Intente nuevamente.");
+        } finally {
+            setCargando(false);
         }
     }
 
-    const handleRecuperar = () => {
+    const handleRecuperar = async () => {
         if(recoverEmail.trim() === '') {
             Alert.alert("Error", "Por favor ingresa tu correo para recuperar la contraseña");
             return;
         }
-        if(!/\S+@\S+\.\S+/.test(recoverEmail)){
-            Alert.alert("Error", "Por favor ingresa un correo válido");
-            return;
-        }
         
-        Alert.alert("Correo Enviado", "Si el correo existe, recibirás instrucciones para restablecer tu contraseña.");
-        setModalVisible(false);
-        setRecoverEmail('');
+        try {
+            const resultado = await AuthController.verificarEmailExiste(recoverEmail);
+            
+            if (resultado.exito) {
+                Alert.alert(
+                    "Correo Enviado", 
+                    "Si el correo existe, recibirás instrucciones para restablecer tu contraseña."
+                );
+                setModalVisible(false);
+                setRecoverEmail('');
+            } else {
+                Alert.alert("Error", "No se encontró una cuenta con ese correo");
+            }
+        } catch (error) {
+            console.error('Error en recuperación:', error);
+            Alert.alert("Error", "Ocurrió un error. Intente nuevamente.");
+        }
     }
 
     return (
@@ -91,8 +118,16 @@ export default function Login ({ navigation }) {
                     <Pressable style={styles.olvidoContra} onPress={() => setModalVisible(true)}>
                         <Text style={styles.textoOlvido}>¿Olvidaste tu contraseña?</Text>
                     </Pressable>
-                    <Pressable style={styles.botonIniciar} onPress={validacion}>
-                        <Text style={styles.textoBotonIniciar}>Iniciar Sesión</Text>
+                    <Pressable 
+                        style={[styles.botonIniciar, cargando && styles.botonDeshabilitado]} 
+                        onPress={validacion}
+                        disabled={cargando}
+                    >
+                        {cargando ? (
+                            <ActivityIndicator color="#FFFFFF" />
+                        ) : (
+                            <Text style={styles.textoBotonIniciar}>Iniciar Sesión</Text>
+                        )}
                     </Pressable>
                     
                     <Pressable style={styles.botonRegistro} onPress={() => navigation.navigate('Registro')}>
@@ -245,6 +280,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 6,
         elevation: 6,
+    },
+    botonDeshabilitado: {
+        backgroundColor: '#6B8BB5',
+        opacity: 0.7,
     },
     textoBotonIniciar: {
         color: '#FFFFFF',

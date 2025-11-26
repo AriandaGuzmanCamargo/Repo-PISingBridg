@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { initDatabase } from './database/database';
 
 import Inicio from './Screens/inicio';
 import Login from './Screens/login';
@@ -16,6 +18,30 @@ import DetalleLetra from './Screens/DetalleLetra';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [dbInicializada, setDbInicializada] = useState(false);
+
+  useEffect(() => {
+    // Inicializar la base de datos al cargar la app
+    initDatabase()
+      .then(() => {
+        console.log('✅ Base de datos inicializada correctamente');
+        setDbInicializada(true);
+      })
+      .catch(error => {
+        console.error('❌ Error al inicializar la base de datos:', error);
+        setDbInicializada(true); // Continuar aunque haya error
+      });
+  }, []);
+
+  // Mostrar pantalla de carga mientras se inicializa la BD
+  if (!dbInicializada) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#004A93" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -32,3 +58,12 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+});

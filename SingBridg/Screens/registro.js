@@ -1,5 +1,7 @@
-import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert, ScrollView } from 'react-native'
-import React, { Component } from 'react'
+import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert, ScrollView, ActivityIndicator } from 'react-native'
+import React, { useEffect } from 'react'
+import { AuthController } from '../controllers/AuthController'
+import { initDatabase } from '../database/database'
 
 const { width } = Dimensions.get('window');
 export default function Registro ({ navigation }) {
@@ -7,26 +9,49 @@ export default function Registro ({ navigation }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
+    const [cargando, setCargando] = React.useState(false);
     
-    //validacion de formulario
-    const validacion=()=>{
-        if(nombre.trim()==='' || email.trim()==='' || password.trim()==='' || confirmPassword.trim()===''){
-            Alert.alert("Error", "Por favor complete todos los campos");
-        }else if(nombre.trim()===''){
-            Alert.alert("Error", "Por favor ingrese su nombre");
-        }else if(email.trim()===''){
-            Alert.alert("Error", "Por favor ingrese un email");
-        }else if(!/\S+@\S+\.\S+/.test(email)){
-            Alert.alert("Error", "Por favor ingrese un email válido");
-        }else if(password.trim()===''){
-            Alert.alert("Error", "Por favor ingrese una contraseña");
-        }else if(password.length < 6){
-            Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
-        }else if(password !== confirmPassword){
-            Alert.alert("Error", "Las contraseñas no coinciden");
-        }else{
-            Alert.alert("Éxito", "Registro exitoso");
-            navigation.navigate('Login');
+    // Inicializar la base de datos cuando se carga el componente
+    useEffect(() => {
+        initDatabase()
+            .then(() => console.log('Base de datos inicializada'))
+            .catch(error => console.error('Error al inicializar BD:', error));
+    }, []);
+    
+    //validacion de formulario y registro
+    const validacion = async () => {
+        setCargando(true);
+        
+        try {
+            const resultado = await AuthController.registrarUsuario(
+                nombre,
+                email,
+                password,
+                confirmPassword
+            );
+            
+            if (resultado.exito) {
+                Alert.alert("Éxito", resultado.mensaje, [
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            // Limpiar formulario
+                            setNombre('');
+                            setEmail('');
+                            setPassword('');
+                            setConfirmPassword('');
+                            navigation.navigate('Login');
+                        }
+                    }
+                ]);
+            } else {
+                Alert.alert("Error", resultado.mensaje);
+            }
+        } catch (error) {
+            console.error('Error en registro:', error);
+            Alert.alert("Error", "Ocurrió un error al registrar. Intente nuevamente.");
+        } finally {
+            setCargando(false);
         }
     }
     return (
@@ -103,8 +128,16 @@ export default function Registro ({ navigation }) {
                         />
                     </View>
                     
-                    <Pressable style={styles.botonIniciar} onPress={validacion}>
-                        <Text style={styles.textoBotonIniciar}>Registrarse</Text>
+                    <Pressable 
+                        style={[styles.botonIniciar, cargando && styles.botonDeshabilitado]} 
+                        onPress={validacion}
+                        disabled={cargando}
+                    >
+                        {cargando ? (
+                            <ActivityIndicator color="#FFFFFF" />
+                        ) : (
+                            <Text style={styles.textoBotonIniciar}>Registrarse</Text>
+                        )}
                     </Pressable>
                     
                     <Pressable style={styles.botonRegistro} onPress={() => navigation.navigate('Login')}>
@@ -227,6 +260,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 6,
         elevation: 6,
+    },
+    botonDeshabilitado: {
+        backgroundColor: '#6B8BB5',
+        opacity: 0.7,
     },
     textoBotonIniciar: {
         color: '#FFFFFF',
