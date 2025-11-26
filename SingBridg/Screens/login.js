@@ -1,10 +1,14 @@
-import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert } from 'react-native'
-import React, { Component } from 'react'
+import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert, Modal } from 'react-native'
+import React, { useState } from 'react'
 
 const { width } = Dimensions.get('window');
 export default function Login ({ navigation }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [recoverEmail, setRecoverEmail] = useState('');
+
     //validacion de formulario
     const validacion=()=>{
         if(email.trim()==='' || password.trim()===''){
@@ -21,6 +25,22 @@ export default function Login ({ navigation }) {
             navigation.navigate('Dashboard');
         }
     }
+
+    const handleRecuperar = () => {
+        if(recoverEmail.trim() === '') {
+            Alert.alert("Error", "Por favor ingresa tu correo para recuperar la contraseña");
+            return;
+        }
+        if(!/\S+@\S+\.\S+/.test(recoverEmail)){
+            Alert.alert("Error", "Por favor ingresa un correo válido");
+            return;
+        }
+        
+        Alert.alert("Correo Enviado", "Si el correo existe, recibirás instrucciones para restablecer tu contraseña.");
+        setModalVisible(false);
+        setRecoverEmail('');
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.titulocontainer}>
@@ -68,7 +88,7 @@ export default function Login ({ navigation }) {
                         />
                     </View>
                     
-                    <Pressable style={styles.olvidoContra}>
+                    <Pressable style={styles.olvidoContra} onPress={() => setModalVisible(true)}>
                         <Text style={styles.textoOlvido}>¿Olvidaste tu contraseña?</Text>
                     </Pressable>
                     <Pressable style={styles.botonIniciar} onPress={validacion}>
@@ -79,6 +99,37 @@ export default function Login ({ navigation }) {
                         <Text style={styles.textoRegistro}>¿No tienes una cuenta? <Text style={styles.textoRegistroDestacado}>Regístrate</Text></Text>
                     </Pressable>
                 </View>
+
+                <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(!modalVisible)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalTitle}>Recuperar Contraseña</Text>
+                        <Text style={styles.modalText}>Ingresa tu correo electrónico para recibir instrucciones.</Text>
+                        
+                        <TextInput
+                            style={[styles.input, { width: '100%', marginBottom: 20 }]}
+                            placeholder='ejemplo@gmail.com'
+                            placeholderTextColor='#999'
+                            keyboardType='email-address'
+                            value={recoverEmail}
+                            onChangeText={setRecoverEmail}/>
+
+                        <Pressable style={[styles.botonIniciar, { marginBottom: 10, width: '100%' }]} onPress={handleRecuperar}>
+                            <Text style={styles.textoBotonIniciar}>Enviar</Text>
+                        </Pressable>
+
+                        <Pressable style={[styles.botonRegistro]} onPress={() => setModalVisible(!modalVisible)}>
+                            <Text style={[styles.textoRegistroDestacado, { color: '#FF4444' }]}>Cancelar</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
+
         </View>
     )
 }
@@ -213,4 +264,37 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
         color: '#1103AB',
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0,0,0,0.6)' // Fondo oscuro semitransparente
+    },
+    modalView: {
+        width: '85%',
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 30,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        color: '#1F3A5F',
+    },
+    modalText: {
+        marginBottom: 20,
+        textAlign: "center",
+        color: '#555',
+        fontSize: 16
+    }
 })
