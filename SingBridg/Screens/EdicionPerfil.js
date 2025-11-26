@@ -5,7 +5,7 @@ import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
 
-export default function EdicionPerfil() {
+export default function EdicionPerfil({ navigation }) {
 
     const [mostrar, setMostrar] = useState(null);
     const [selectedTab, setSelectedTab] = useState('profile');
@@ -89,6 +89,56 @@ export default function EdicionPerfil() {
         }
     };
 
+    const handleCerrarSesion = () => {
+        Alert.alert(
+            'Cerrar Sesión',
+            '¿Estás seguro que deseas cerrar sesión?',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Cerrar Sesión',
+                    onPress: () => {
+                        console.log('Cerrando sesión...');
+                        // Navegar a la pantalla de Inicio
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Inicio' }],
+                        });
+                    }
+                }
+            ]
+        );
+    };
+
+    const handleEliminarCuenta = () => {
+        Alert.alert(
+            '¡ADVERTENCIA!',
+            '¿Estás seguro que deseas eliminar tu cuenta? Esta acción es irreversible y se eliminarán todos tus datos.',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Eliminar',
+                    style: 'destructive',
+                    onPress: () => {
+                        console.log('Eliminando cuenta de la base de datos...');
+                        // Aquí se implementará la lógica para eliminar la cuenta de la base de datos
+                        // Navegar a la pantalla de Inicio
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Inicio' }],
+                        });
+                    }
+                }
+            ]
+        );
+    };
+
     return (
         <View style={styles.Container}>
             <ScrollView contentContainerStyle={{paddingBottom: 100}}>
@@ -148,6 +198,16 @@ export default function EdicionPerfil() {
                         <Text style={styles.textoBoton}>Confirmar</Text>
                     </Pressable>
                 </View>
+
+
+                <Pressable style={styles.botonCerrarSesion} onPress={handleCerrarSesion}>
+                    <Text style={styles.textoCerrarSesion}>Cerrar Sesión</Text>
+                </Pressable>
+
+
+                <Pressable style={styles.botonEliminarCuenta} onPress={handleEliminarCuenta}>
+                    <Text style={styles.textoEliminarCuenta}>Eliminar Cuenta</Text>
+                </Pressable>
             </View>
 
             <View style={styles.fondoInferior}>
@@ -395,6 +455,46 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 15,
         fontSize: 18,
-    }
+    },
+    botonCerrarSesion: {
+        marginTop: -80,
+        width: ANCHO * 0.9,
+        borderRadius: 14,
+        paddingVertical: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderWidth: 2,
+        borderColor: '#0057A8',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    textoCerrarSesion: {
+        fontSize: 18,
+        color: '#0057A8',
+        fontWeight: '600',
+    },
+    botonEliminarCuenta: {
+        marginTop: 16,
+        width: ANCHO * 0.9,
+        borderRadius: 14,
+        paddingVertical: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#FF3B30',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    textoEliminarCuenta: {
+        fontSize: 18,
+        color: '#FFFFFF',
+        fontWeight: '600',
+    },
 
 });
