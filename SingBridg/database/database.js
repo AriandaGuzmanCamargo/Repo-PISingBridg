@@ -99,17 +99,16 @@ export const actualizarUsuario = (id, nombre, email) => {
     }
 };
 
-// Actualizar contraseña
-export const actualizarPassword = (id, nuevaPassword) => {
+export const eliminarUsuarioPorEmail = (email) => {
     try {
         const result = db.runSync(
-            'UPDATE usuarios SET password = ? WHERE id = ?',
-            [nuevaPassword, id]
+            'DELETE FROM usuarios WHERE email = ?',
+            [email]
         );
-        console.log('Contraseña actualizada exitosamente');
+        console.log('Usuario eliminado exitosamente');
         return Promise.resolve(result);
     } catch (error) {
-        console.log('Error al actualizar contraseña:', error);
+        console.log('Error al eliminar usuario:', error);
         return Promise.reject(error);
     }
 };

@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
-import { View, Text, StyleSheet, Image, Pressable, TextInput, Dimensions, Modal, ScrollView, Alert } from 'react-native';
+import {Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
+import { eliminarUsuarioPorEmail, buscarUsuarioPorEmail } from '../database/database';
+
 
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
@@ -9,7 +11,8 @@ export default function EdicionPerfil({ navigation }) {
 
     const [mostrar, setMostrar] = useState(null);
     const [selectedTab, setSelectedTab] = useState('profile');
-
+    const [modalEliminarVisible, setModalEliminarVisible] = useState(false);
+    const [emailConfirmacion, setEmailConfirmacion] = useState('');
 
     const [nombre, setNombre] = useState('');
     const [correo, setCorreo] = useState('');
@@ -102,7 +105,7 @@ export default function EdicionPerfil({ navigation }) {
                     text: 'Cerrar Sesión',
                     onPress: () => {
                         console.log('Cerrando sesión...');
-                        // Navegar a la pantalla de Inicio
+                     
                         navigation.reset({
                             index: 0,
                             routes: [{ name: 'Inicio' }],
@@ -113,31 +116,57 @@ export default function EdicionPerfil({ navigation }) {
         );
     };
 
-    const handleEliminarCuenta = () => {
-        Alert.alert(
-            '¡ADVERTENCIA!',
-            '¿Estás seguro que deseas eliminar tu cuenta? Esta acción es irreversible y se eliminarán todos tus datos.',
-            [
-                {
-                    text: 'Cancelar',
-                    style: 'cancel'
-                },
-                {
-                    text: 'Eliminar',
-                    style: 'destructive',
-                    onPress: () => {
-                        console.log('Eliminando cuenta de la base de datos...');
-                        // Aquí se implementará la lógica para eliminar la cuenta de la base de datos
-                        // Navegar a la pantalla de Inicio
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: 'Inicio' }],
-                        });
-                    }
-                }
-            ]
-        );
+    const handleConfirmarEliminacion = async () => {
+        try {
+            const emailSesion = (correo || '').toLowerCase().trim();
+
+            const emailIngresado = emailConfirmacion.toLowerCase().trim();
+
+            if (!emailIngresado) {
+                Alert.alert('Error', 'Ingresa tu correo para confirmar la eliminación.');
+                return;
+            }
+
+            if (emailSesion && emailIngresado !== emailSesion) {
+                Alert.alert('Error', 'El correo no coincide con el de la cuenta actual.');
+                return;
+            }
+
+            const usuarios = await buscarUsuarioPorEmail(emailIngresado);
+            if (!usuarios || usuarios.length === 0) {
+                Alert.alert('Error', 'No se encontró ninguna cuenta con ese correo.');
+                return;
+            }
+
+            await eliminarUsuarioPorEmail(emailIngresado);
+
+            setModalEliminarVisible(false);
+            setEmailConfirmacion('');
+
+            Alert.alert(
+                'Cuenta eliminada',
+                'Tu cuenta ha sido eliminada exitosamente',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Inicio' }],
+                            });
+                        },
+                    },
+                ]
+            );
+        } catch (error) {
+            console.error('Error al eliminar cuenta:', error);
+            Alert.alert('Error', 'No se pudo eliminar la cuenta. Intenta de nuevo.');
+        }
     };
+
+
+
+
 
     return (
         <View style={styles.Container}>
@@ -205,9 +234,13 @@ export default function EdicionPerfil({ navigation }) {
                 </Pressable>
 
 
-                <Pressable style={styles.botonEliminarCuenta} onPress={handleEliminarCuenta}>
-                    <Text style={styles.textoEliminarCuenta}>Eliminar Cuenta</Text>
+                <Pressable
+                    style={styles.botonEliminar}
+                    onPress={() => setModalEliminarVisible(true)}
+                >
+                    <Text style={styles.textoBotonEliminar}>Eliminar cuenta</Text>
                 </Pressable>
+
             </View>
 
             <View style={styles.fondoInferior}>
@@ -254,6 +287,53 @@ export default function EdicionPerfil({ navigation }) {
                     </View>
                 </View>
             </Modal>
+
+            <Modal
+                visible={modalEliminarVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setModalEliminarVisible(false)}
+            >
+                <View style={styles.overlayEliminar}>
+                    <View style={styles.modalEliminar}>
+                        <Text style={styles.tituloEliminar}>Eliminar cuenta</Text>
+                        <Text style={styles.textoEliminar}>
+                            Esta acción es irreversible. Para confirmar, ingresa el correo de tu cuenta.
+                        </Text>
+
+                        <TextInput
+                            style={styles.inputEliminar}
+                            placeholder="Tu correo"
+                            placeholderTextColor="#999"
+                            value={emailConfirmacion}
+                            onChangeText={setEmailConfirmacion}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+
+                        <View style={styles.botonesEliminarRow}>
+                            <Pressable
+                                style={styles.botonCancelarEliminar}
+                                onPress={() => {
+                                    setModalEliminarVisible(false);
+                                    setEmailConfirmacion('');
+                                }}
+                            >
+                                <Text style={styles.textCancelarEliminar}>Cancelar</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={styles.botonConfirmarEliminar}
+                                onPress={handleConfirmarEliminacion}
+                            >
+                                <Text style={styles.textConfirmarEliminar}>Confirmar</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
 
             <BarraNavegacionInferior selectedTab={selectedTab} onTabChange={handleTabChange} />
 
@@ -496,5 +576,61 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontWeight: '600',
     },
+    overlayEliminar: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalEliminar: {
+        width: '85%',
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 20,
+    },
+    tituloEliminar: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#c62828',
+    },
+    textoEliminar: {
+        fontSize: 14,
+        color: '#555',
+        marginBottom: 15,
+    },
+    inputEliminar: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        marginBottom: 20,
+    },
+    botonesEliminarRow: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    botonCancelarEliminar: {
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        marginRight: 10,
+    },
+    textCancelarEliminar: {
+        color: '#555',
+        fontSize: 14,
+    },
+    botonConfirmarEliminar: {
+        backgroundColor: '#c62828',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+    },
+    textConfirmarEliminar: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+
 
 });
