@@ -1,4 +1,4 @@
-@ -1,217 +0,0 @@
+
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, Dimensions } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
