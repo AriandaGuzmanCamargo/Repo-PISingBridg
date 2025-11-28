@@ -16,7 +16,7 @@ const COLORES = {
 
 export default function Traductor({ navigation }) {
     
-    const [textoEntrada, setTextoEntrada] = useState('Ellos');
+    const [textoEntrada, setTextoEntrada] = useState('');
     const [selectedTab, setSelectedTab] = useState('home');
 
     const handleTabChange = (tab) => {
@@ -27,6 +27,25 @@ export default function Traductor({ navigation }) {
     const handleSwitch = () => {
         alert("Función de alternar no implementada");
     };
+
+    const imagenesSenas = {
+        agua: {
+            imagen: require('../assets/agua.png'),
+            descripcion: 'La seña de "agua" se hace con la mano en forma de C, moviéndola cerca de la boca.'
+        },
+        comida: {
+            imagen: require('../assets/comida.png'),
+            descripcion: 'Lleva la mano en forma de “O” a la boca dos veces, como si comieras.'
+        },
+        dulce: {
+            imagen: require('../assets/dulce.png'),
+            descripcion: 'Lleva la punta de los dedos a un lado de la boca y bájalos un poco, como probando algo dulce.'
+        },
+        
+        // aqui agregamos las demas imagenes de las palabras usamos la misma estructura 
+    };
+
+    const palabra = textoEntrada.trim().toLowerCase();
 
     return (
         <View style={estilos.contenedorPrincipal}>
@@ -51,11 +70,8 @@ export default function Traductor({ navigation }) {
             </View>
 
             <ScrollView contentContainerStyle={estilos.contenidoScroll} showsVerticalScrollIndicator={false}>
-                
-
                 <View style={estilos.contenedorMedios}>
-                    
-        
+                
                     <View style={estilos.columnaMedio}>
                         <Text style={estilos.tituloMedio}>Texto</Text>
                         <View style={estilos.tarjetaEntrada}>
@@ -78,20 +94,27 @@ export default function Traductor({ navigation }) {
                         <Text style={estilos.tituloMedio}>Señas</Text>
                         <View style={estilos.tarjetaSalida}>
             
-                            <Image 
-                                source={{ uri: 'https://placehold.co/150x150/d1d1d1/000000?text=SEÑA' }} 
-                                style={estilos.imagenSeña}
-                            />
+                           {palabra !== '' && imagenesSenas[palabra] && (
+                                <Image 
+                                    source={imagenesSenas[palabra].imagen} 
+                                    style={estilos.imagenSena}
+                                />
+                            )}
+
                         </View>
                     </View>
                 </View>
 
-                <View style={estilos.contenedorDescripcion}>
-                    <Text style={estilos.tituloDescripcion}>Descripción</Text>
-                    <Text style={estilos.textoDescripcion}>
-                        Se estira el dedo índice, se mueve en medio círculo, y con él se señala a varias personas.
-                    </Text>
-                </View>
+               
+                {palabra !== '' && imagenesSenas[palabra] && (
+                    <View style={estilos.contenedorDescripcion}>
+                        <Text style={estilos.tituloDescripcion}>Descripción</Text>
+                        <Text style={estilos.textoDescripcion}>
+                            {imagenesSenas[palabra].descripcion}
+                        </Text>
+                    </View>
+                )}
+
 
             </ScrollView>
 
@@ -277,5 +300,10 @@ const estilos = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         lineHeight: 24,
+    },
+    imagenSena: { // se encarga de adaptar la imagen 
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
     },
 });
