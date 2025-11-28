@@ -235,10 +235,10 @@ export default function EdicionPerfil({ navigation }) {
 
 
                 <Pressable
-                    style={styles.botonEliminar}
+                    style={styles.botonEliminarCuenta}
                     onPress={() => setModalEliminarVisible(true)}
                 >
-                    <Text style={styles.textoBotonEliminar}>Eliminar cuenta</Text>
+                    <Text style={styles.textoEliminarCuenta}>Eliminar cuenta</Text>
                 </Pressable>
 
             </View>
