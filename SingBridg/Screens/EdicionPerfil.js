@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 import { eliminarUsuarioPorEmail, buscarUsuarioPorEmail } from '../database/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const { width } = Dimensions.get('window');
@@ -20,6 +21,24 @@ export default function EdicionPerfil({ navigation }) {
 
     const [nuevaContrasena, setNuevaContrasena] = useState('');
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
+
+    useEffect(() => {
+        const cargarUsuario = async () => {
+            try {
+                const data = await AsyncStorage.getItem('usuario');
+                if (data) {
+                    const usuario = JSON.parse(data);
+                    setNombre(usuario.nombre);
+                    setCorreo(usuario.email);
+                }
+            } catch (error) {
+                console.log('Error cargando usuario desde AsyncStorage:', error);
+            }
+        };
+
+        cargarUsuario();
+    }, []);
+
 
     const handleTabChange = (tab) => {
         setSelectedTab(tab);
@@ -185,9 +204,9 @@ export default function EdicionPerfil({ navigation }) {
                     />
 
                     <View style={styles.infoUsuario}>
-                        <Text style={styles.textoBienvenida}>Bienvenido Usuario</Text>
-                        <Text style={styles.textoNombre}>Usuario Demo</Text>
-                        <Text style={styles.textoCorreo}>Correo: Usuario.D@gmail.com</Text>
+                        <Text style={styles.textoBienvenida}>Bienvenido</Text>
+                        <Text style={styles.textoNombre}>{nombre || 'Usuario'}</Text>
+                        <Text style={styles.textoCorreo}>Correo: {correo || '---'}</Text>
                     </View>
                 </View>
             </View>

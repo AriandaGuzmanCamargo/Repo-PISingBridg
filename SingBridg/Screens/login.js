@@ -2,6 +2,7 @@ import { Text, StyleSheet, View, Image,TextInput,Pressable, Dimensions, Alert, M
 import React, { useState, useEffect } from 'react'
 import { AuthController } from '../controllers/AuthController'
 import { initDatabase } from '../database/database'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 export default function Login ({ navigation }) {
@@ -22,16 +23,26 @@ export default function Login ({ navigation }) {
     //validacion de formulario y login
     const validacion = async () => {
         setCargando(true);
-        
+
         try {
             const resultado = await AuthController.iniciarSesion(email, password);
-            
+
             if (resultado.exito) {
-                // Limpiar formulario
+               try{
+                   await AsyncStorage.setItem(
+                       'usuario',
+                       JSON.stringify(resultado.usuario));
+
+               } catch (error){
+                     console.error('Error al guardar en AsyncStorage:', error);
+               }
                 setEmail('');
                 setPassword('');
-                // Navegar al Dashboard
-                navigation.navigate('Dashboard');
+
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Dashboard' }],
+                });
             } else {
                 Alert.alert("Error", resultado.mensaje);
             }
