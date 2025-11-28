@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
-import { eliminarUsuarioPorEmail, buscarUsuarioPorEmail } from '../database/database';
+import { eliminarUsuarioPorEmail, buscarUsuarioPorEmail, actualizarUsuario, verificarCredenciales } from '../database/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -22,6 +22,10 @@ export default function EdicionPerfil({ navigation }) {
     const [nuevaContrasena, setNuevaContrasena] = useState('');
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
 
+    const [usuarioId, setUsuarioId] = useState(null);
+    const [correoOriginal, setCorreoOriginal] = useState('');
+
+
     useEffect(() => {
         const cargarUsuario = async () => {
             try {
@@ -30,6 +34,8 @@ export default function EdicionPerfil({ navigation }) {
                     const usuario = JSON.parse(data);
                     setNombre(usuario.nombre);
                     setCorreo(usuario.email);
+                    setCorreoOriginal(usuario.email);
+                    setUsuarioId(usuario.id);
                 }
             } catch (error) {
                 console.log('Error cargando usuario desde AsyncStorage:', error);
@@ -92,15 +98,48 @@ export default function EdicionPerfil({ navigation }) {
         return true;
     };
 
-    const handleConfirmar = () => {
-        if (validarFormulario()) {
-            Alert.alert('Éxito', 'Perfil actualizado correctamente');
-            console.log('Formulario válido', { nombre, correo });
-            setNombre('');
-            setCorreo('');
+    const handleConfirmar = async () => {
+        if (!validarFormulario()) return;
+
+        try {
+            if (!usuarioId || !correoOriginal) {
+                Alert.alert('Error', 'No se pudo identificar al usuario actual.');
+                return;
+            }
+
+            const usuarioValido = await verificarCredenciales(
+                correoOriginal.toLowerCase().trim(),
+                contrasena
+            );
+
+            if (!usuarioValido) {
+                Alert.alert('Error', 'La contraseña actual no es correcta.');
+                return;
+            }
+            
+            await actualizarUsuario(
+                usuarioId,
+                nombre.trim(),
+                correo.trim()
+            );
+
+            const usuarioActualizado = {
+                id: usuarioId,
+                nombre: nombre.trim(),
+                email: correo.trim(),
+            };
+
+            await AsyncStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+
             setContrasena('');
+
+            Alert.alert('Éxito', 'Perfil actualizado correctamente');
+        } catch (error) {
+            console.error('Error al actualizar perfil:', error);
+            Alert.alert('Error', 'No se pudo actualizar el perfil. Intenta de nuevo.');
         }
     };
+
 
     const handleActualizarContrasena = () => {
         if (validarCambioContrasena()) {
@@ -218,7 +257,7 @@ export default function EdicionPerfil({ navigation }) {
                         style={styles.input}
                         value={nombre}
                         onChangeText={setNombre}
-                        placeholder="Ingresa tu nombre"
+                        placeholder="Ingresa el nuevo nombre"
                     />
 
                     <Text style={[styles.etiqueta, { marginTop: 14 }]}>Correo:</Text>
@@ -226,7 +265,7 @@ export default function EdicionPerfil({ navigation }) {
                         style={styles.input}
                         value={correo}
                         onChangeText={setCorreo}
-                        placeholder="Ingresa tu correo"
+                        placeholder="Ingresa el nuevo correo"
                         keyboardType="email-address"
                         autoCapitalize="none"
                     />
