@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Pressable, Dimensions, SafeAreaView } from 'react-native';
+import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
 const { width } = Dimensions.get('window');
 const ANCHO = width * 0.9;
@@ -65,12 +66,11 @@ export default function PantallaDetalleLetra({ navigation }) {
 
             </View>
             
-            {/* Barra de Navegación Inferior (Footer) - Adaptado de 'fondoM' */}
-            <View style={styles.piePagina}>
-                <Text style={styles.iconoPie}>⚙️</Text>
-                <Text style={styles.iconoPie}>🏠</Text>
-                <Text style={styles.iconoPie}>👤</Text>
-            </View>
+             {/* Barra de navegación inferior */}
+            <BarraNavegacionInferior 
+            selectedTab={selectedTab} 
+            onTabChange={handleTabChange}
+            />
         </SafeAreaView>
     );
 }
