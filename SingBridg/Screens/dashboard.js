@@ -7,7 +7,9 @@ export default function Dashboard({ navigation }) {
     
     const handleTabChange = (tab) => {
         setSelectedTab(tab);
-        if (tab === 'profile') {
+        if (tab === 'traductor') {
+            navigation.navigate('Traductor');
+        } else if (tab === 'profile') {   
         } else if (tab === 'settings') {
         }
     };

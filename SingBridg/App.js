@@ -13,7 +13,8 @@ import EdicionPerfil from './Screens/EdicionPerfil';
 import Diccionario from './Screens/Diccionario';
 import vocabulario from './Screens/vocabulario';
 import DetalleLetra from './Screens/DetalleLetra';
-
+import DetalleVocabulario from './Screens/detalleVocabulario';
+import Traductor from './Screens/traductor.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,8 @@ export default function App() {
         <Stack.Screen name="Diccionario" component={Diccionario} />
         <Stack.Screen name="vocabulario" component={vocabulario} />
         <Stack.Screen name="DetalleLetra" component={DetalleLetra} />
+        <Stack.Screen name="detalleVocabulario" component={DetalleVocabulario} />
+        <Stack.Screen name="traductor" component={Traductor} />
       </Stack.Navigator>
     </NavigationContainer>
   );

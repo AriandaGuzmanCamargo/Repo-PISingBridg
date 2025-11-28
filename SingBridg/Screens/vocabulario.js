@@ -90,7 +90,7 @@ export default function vocabulario({ navigation, route }) {
 
     const manejarDetallePalabra = (palabra) => {
         console.log(`Navegando al detalle de: ${palabra}`);
-        // navigation.navigate('DetallePalabra', { palabra });
+        navigation.navigate('detalleVocabulario', { palabra:palabra });
     };
 
     return(
