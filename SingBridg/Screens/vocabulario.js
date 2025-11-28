@@ -19,7 +19,7 @@ const ABECEDARIO = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 
 const VOCABULARIO_POR_LETRA = {
     'A': ['Agua', 'Abrir', 'Alto', 'Ayuda', 'Apetito', 'Amigo', 'Adiós'],
     'B': ['Bueno', 'Baño', 'Bebé', 'Beber', 'Beso', 'Blanco', 'Bonito'],
-    'C': ['Casa', 'Comer', 'Calor', 'Caminar', 'Cansado', 'Carro', 'Cielo'],
+    'C': ['Casa', 'Comida', 'Calor', 'Caminar', 'Cansado', 'Carro', 'Cielo'],
     'D': ['Día', 'Dolor', 'Dormir', 'Dulce', 'Dinero', 'Diente', 'Derecha'],
     'E': ['Escuela', 'Enfermo', 'Esperar', 'Estudiar', 'Escribir', 'Escuchar', 'Estrella'],
     'F': ['Familia', 'Feliz', 'Frío', 'Fuego', 'Fácil', 'Feo', 'Fuerte'],

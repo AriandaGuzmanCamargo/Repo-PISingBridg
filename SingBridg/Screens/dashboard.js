@@ -32,7 +32,7 @@ export default function Dashboard({ navigation }) {
             progreso: 30,
             imagen: require('../assets/Logo.png'),
             color: '#9E9E9E',
-            pantalla: 'vocabulario'
+            pantalla: 'traductor'
         },
         {
             id: 3,
