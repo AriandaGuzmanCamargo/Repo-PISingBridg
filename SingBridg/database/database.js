@@ -113,4 +113,18 @@ export const eliminarUsuarioPorEmail = (email) => {
     }
 };
 
+export const actualizarPassword = (id, nuevaPassword) => {
+    try {
+        const result = db.runSync(
+            'UPDATE usuarios SET password = ? WHERE id = ?',
+            [nuevaPassword, id]
+        );
+        console.log('Contraseña actualizada exitosamente');
+        return Promise.resolve(result);
+    } catch (error) {
+        console.log('Error al actualizar contraseña:', error);
+        return Promise.reject(error);
+    }
+};
+
 export default db;
