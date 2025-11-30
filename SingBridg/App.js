@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { initDatabase } from './database/database';
 
 import Inicio from './Screens/inicio';
@@ -22,6 +22,13 @@ export default function App() {
   const [dbInicializada, setDbInicializada] = useState(false);
 
   useEffect(() => {
+    // Inicializar la base de datos solo en plataformas nativas
+    if (Platform.OS === 'web') {
+      console.log('⚠️ Base de datos deshabilitada en web');
+      setDbInicializada(true);
+      return;
+    }
+    
     // Inicializar la base de datos al cargar la app
     initDatabase()
       .then(() => {

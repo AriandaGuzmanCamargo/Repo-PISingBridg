@@ -12,6 +12,7 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/native": "^7.1.21",
     "@react-navigation/native-stack": "^7.7.0",
+    "@sqlite.org/sqlite-wasm": "^3.51.1-build1",
     "expo": "~54.0.25",
     "expo-av": "~16.0.7",
     "expo-sqlite": "~16.0.9",
