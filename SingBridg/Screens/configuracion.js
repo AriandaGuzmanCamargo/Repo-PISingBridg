@@ -147,7 +147,7 @@ export default function Configuracion({ navigation }) {
                         </Pressable>
                         <Text style={styles.headerTitle}>Configuración</Text>
                         <View style={styles.iconoVisible}>
-                            <Text style={styles.iconoOjo}>👁</Text>
+                            <Text style={styles.iconoOjo}></Text>
                         </View>
                     </View>
                 </View>
