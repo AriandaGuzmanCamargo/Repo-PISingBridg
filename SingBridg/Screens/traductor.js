@@ -1,131 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput, Dimensions } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
+import imagenes from '../utils/imagenes';   // mapa de imágenes con require()
+import { buscarPalabra } from '../database'; // consulta a SQLite
 
 const { width } = Dimensions.get('window');
 const COLORES = {
-    azulFuerte: '#1F3A5F', 
-    azulIntermedio: '#A2BCD6', 
-    blanco: '#ffffff',
-    grisClaro: '#e4e4e4ff',
-    grisMedio: '#CCCCCC',
-    negro: '#000000',
-    azulBoton: '#004A93', 
+  azulFuerte: '#1F3A5F', 
+  azulIntermedio: '#A2BCD6', 
+  blanco: '#ffffff',
+  grisClaro: '#e4e4e4ff',
+  grisMedio: '#CCCCCC',
+  negro: '#000000',
+  azulBoton: '#004A93', 
 };
 
-
 export default function Traductor({ navigation }) {
-    
-    const [textoEntrada, setTextoEntrada] = useState('');
-    const [selectedTab, setSelectedTab] = useState('home');
+  const [textoEntrada, setTextoEntrada] = useState('');
+  const [resultado, setResultado] = useState(null);
+  const [selectedTab, setSelectedTab] = useState('home');
 
-    const handleTabChange = (tab) => {
-        setSelectedTab(tab);
-        if (tab === 'home') navigation.navigate(tab);
-    };
-
-    const handleSwitch = () => {
-        alert("Función de alternar no implementada");
-    };
-
-    const imagenesSenas = {
-        agua: {
-            imagen: require('../assets/agua.png'),
-            descripcion: 'La seña de "agua" se hace con la mano en forma de C, moviéndola cerca de la boca.'
-        },
-        comida: {
-            imagen: require('../assets/comida.png'),
-            descripcion: 'Lleva la mano en forma de “O” a la boca dos veces, como si comieras.'
-        },
-        dulce: {
-            imagen: require('../assets/dulce.png'),
-            descripcion: 'Lleva la punta de los dedos a un lado de la boca y bájalos un poco, como probando algo dulce.'
-        },
-        
-        // aqui agregamos las demas imagenes de las palabras usamos la misma estructura 
-    };
-
+  // Buscar palabra en SQLite cada vez que cambia el texto
+  useEffect(() => {
     const palabra = textoEntrada.trim().toLowerCase();
+    if (palabra !== '') {
+      buscarPalabra(palabra).then((res) => {
+        if (res.length > 0) {
+          setResultado(res[0]); // { palabra, descripcion, imagen }
+        } else {
+          setResultado(null);
+        }
+      });
+    } else {
+      setResultado(null);
+    }
+  }, [textoEntrada]);
 
-    return (
-        <View style={estilos.contenedorPrincipal}>
-            <View style={estilos.contenedorEncabezado}>
-                <View style={estilos.tarjetaEncabezado}>
-                    <Pressable onPress={() => navigation.goBack()} style={estilos.botonVolver}>
-                        <Text style={estilos.textoBotonVolver}>←</Text>
-                    </Pressable>
-                    <Text style={estilos.tituloEncabezado}>SignBridge</Text> 
-                    <Image 
-                        source={require('../assets/Logo.png')} 
-                        style={estilos.logoEncabezado} 
-                    />
-                </View>
+  const handleTabChange = (tab) => {
+    setSelectedTab(tab);
+    if (tab === 'home') navigation.navigate(tab);
+  };
 
+  const handleSwitch = () => {
+    alert("Función de alternar no implementada");
+  };
 
-                <View style={estilos.contenedorBotonPrincipal}>
-                    <Pressable style={estilos.botonPrincipal}>
-                        <Text style={estilos.textoBotonPrincipal}>Traductor</Text>
-                    </Pressable>
-                </View>
-            </View>
-
-            <ScrollView contentContainerStyle={estilos.contenidoScroll} showsVerticalScrollIndicator={false}>
-                <View style={estilos.contenedorMedios}>
-                
-                    <View style={estilos.columnaMedio}>
-                        <Text style={estilos.tituloMedio}>Texto</Text>
-                        <View style={estilos.tarjetaEntrada}>
-                            <TextInput
-                                style={estilos.inputTexto}
-                                onChangeText={setTextoEntrada}
-                                value={textoEntrada}
-                                multiline={true}
-                                placeholder="Escribe aquí..."
-                            />
-                        </View>
-                    </View>
-
-                    <Pressable onPress={handleSwitch} style={estilos.botonAlternar}>
-                        <Text style={estilos.iconoAlternar}>⇆</Text>
-                    </Pressable>
-
-           
-                    <View style={estilos.columnaMedio}>
-                        <Text style={estilos.tituloMedio}>Señas</Text>
-                        <View style={estilos.tarjetaSalida}>
-            
-                           {palabra !== '' && imagenesSenas[palabra] && (
-                                <Image 
-                                    source={imagenesSenas[palabra].imagen} 
-                                    style={estilos.imagenSena}
-                                />
-                            )}
-
-                        </View>
-                    </View>
-                </View>
-
-               
-                {palabra !== '' && imagenesSenas[palabra] && (
-                    <View style={estilos.contenedorDescripcion}>
-                        <Text style={estilos.tituloDescripcion}>Descripción</Text>
-                        <Text style={estilos.textoDescripcion}>
-                            {imagenesSenas[palabra].descripcion}
-                        </Text>
-                    </View>
-                )}
-
-
-            </ScrollView>
-
-
-            <BarraNavegacionInferior 
-                selectedTab={selectedTab} 
-                onTabChange={handleTabChange}
-            />
+  return (
+    <View style={estilos.contenedorPrincipal}>
+      {/* Encabezado */}
+      <View style={estilos.contenedorEncabezado}>
+        <View style={estilos.tarjetaEncabezado}>
+          <Pressable onPress={() => navigation.goBack()} style={estilos.botonVolver}>
+            <Text style={estilos.textoBotonVolver}>←</Text>
+          </Pressable>
+          <Text style={estilos.tituloEncabezado}>SignBridge</Text> 
+          <Image 
+            source={require('../assets/Logo.png')} 
+            style={estilos.logoEncabezado} 
+          />
         </View>
-    );
+
+        <View style={estilos.contenedorBotonPrincipal}>
+          <Pressable style={estilos.botonPrincipal}>
+            <Text style={estilos.textoBotonPrincipal}>Traductor</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Contenido */}
+      <ScrollView contentContainerStyle={estilos.contenidoScroll} showsVerticalScrollIndicator={false}>
+        <View style={estilos.contenedorMedios}>
+          {/* Entrada de texto */}
+          <View style={estilos.columnaMedio}>
+            <Text style={estilos.tituloMedio}>Texto</Text>
+            <View style={estilos.tarjetaEntrada}>
+              <TextInput
+                style={estilos.inputTexto}
+                onChangeText={setTextoEntrada}
+                value={textoEntrada}
+                multiline={true}
+                placeholder="Escribe aquí..."
+              />
+            </View>
+          </View>
+
+          {/* Botón alternar */}
+          <Pressable onPress={handleSwitch} style={estilos.botonAlternar}>
+            <Text style={estilos.iconoAlternar}>⇆</Text>
+          </Pressable>
+
+          {/* Salida de señas */}
+          <View style={estilos.columnaMedio}>
+            <Text style={estilos.tituloMedio}>Señas</Text>
+            <View style={estilos.tarjetaSalida}>
+              {resultado && (
+                <Image 
+                  source={imagenes[resultado.imagen]} 
+                  style={estilos.imagenSeña}
+                />
+              )}
+            </View>
+          </View>
+        </View>
+
+        {/* Descripción */}
+        {resultado && (
+          <View style={estilos.contenedorDescripcion}>
+            <Text style={estilos.tituloDescripcion}>Descripción</Text>
+            <Text style={estilos.textoDescripcion}>
+              {resultado.descripcion}
+            </Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Barra inferior */}
+      <BarraNavegacionInferior 
+        selectedTab={selectedTab} 
+        onTabChange={handleTabChange}
+      />
+    </View>
+  );
 }
+
+
 
 const estilos = StyleSheet.create({
     contenedorPrincipal: {

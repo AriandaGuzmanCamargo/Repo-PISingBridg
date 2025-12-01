@@ -113,4 +113,48 @@ export const eliminarUsuarioPorEmail = (email) => {
     }
 };
 
+
+////////////   DICCIONARIO DE LAS PALABRAS TRADUCTOR 
+db.execSync(
+      `CREATE TABLE IF NOT EXISTS diccionario (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          palabra TEXT UNIQUE NOT NULL,
+          descripcion TEXT NOT NULL,
+          imagen TEXT NOT NULL
+    );`
+);
+
+
+// Insertar nueva palabra
+export const insertarPalabra = (palabra, descripcion, imagen) => {
+  try {
+    const result = db.runSync(
+      'INSERT INTO diccionario (palabra, descripcion, imagen) VALUES (?, ?, ?)',
+      [palabra.toLowerCase(), descripcion, imagen]
+    );
+    console.log('Palabra insertada exitosamente');
+    return Promise.resolve(result);
+  } catch (error) {
+    console.log('Error al insertar palabra:', error);
+    return Promise.reject(error);
+  }
+};
+
+// Buscar palabra
+export const buscarPalabra = (palabra) => {
+  try {
+    const result = db.getAllSync(
+      'SELECT * FROM diccionario WHERE palabra = ?',
+      [palabra.toLowerCase()]
+    );
+    return Promise.resolve(result);
+  } catch (error) {
+    console.log('Error al buscar palabra:', error);
+    return Promise.reject(error);
+  }
+};
+
+
+
+
 export default db;
