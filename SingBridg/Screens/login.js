@@ -12,6 +12,11 @@ export default function Login ({ navigation }) {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [recoverEmail, setRecoverEmail] = useState('');
+    const [recoveryStep, setRecoveryStep] = useState(1); 
+    const [generatedCode, setGeneratedCode] = useState('');
+    const [enteredCode, setEnteredCode] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
     // Inicializar la base de datos cuando se carga el componente
     useEffect(() => {
@@ -61,23 +66,55 @@ export default function Login ({ navigation }) {
             Alert.alert("Error", "Por favor ingresa tu correo para recuperar la contraseña");
             return;
         }
-        
         try {
-            const resultado = await AuthController.verificarEmailExiste(recoverEmail);
-            
+            // Generar código local y mostrarlo en la UI
+            const resultado = await AuthController.generarCodigoRecuperacionLocal(recoverEmail);
+
             if (resultado.exito) {
-                Alert.alert(
-                    "Correo Enviado", 
-                    "Si el correo existe, recibirás instrucciones para restablecer tu contraseña."
-                );
-                setModalVisible(false);
-                setRecoverEmail('');
+                setGeneratedCode(resultado.codigo || '');
+                setRecoveryStep(2);
+                // Mostrar aviso aclaratorio
+                Alert.alert('Código Generado', 'Se generó un código de verificación local. En el siguiente paso ingrésalo junto con la nueva contraseña.');
             } else {
-                Alert.alert("Error", "No se encontró una cuenta con ese correo");
+                Alert.alert('Error', resultado.mensaje || 'No se encontró una cuenta con ese correo');
             }
         } catch (error) {
             console.error('Error en recuperación:', error);
-            Alert.alert("Error", "Ocurrió un error. Intente nuevamente.");
+            Alert.alert('Error', 'Ocurrió un error. Intente nuevamente.');
+        }
+    }
+
+    const handleVerificarYCambiar = async () => {
+        if (!enteredCode.trim()) {
+            Alert.alert('Error', 'Ingresa el código de verificación');
+            return;
+        }
+        if (!newPassword || !confirmNewPassword) {
+            Alert.alert('Error', 'Ingresa la nueva contraseña y confírmala');
+            return;
+        }
+        if (newPassword !== confirmNewPassword) {
+            Alert.alert('Error', 'Las contraseñas no coinciden');
+            return;
+        }
+
+        try {
+            const resultado = await AuthController.verificarCodigoYCambiar(recoverEmail, enteredCode.trim(), newPassword);
+            if (resultado.exito) {
+                Alert.alert('Éxito', 'Contraseña actualizada correctamente. Ahora puedes iniciar sesión con la nueva contraseña.');
+                setModalVisible(false);
+                setRecoverEmail('');
+                setRecoveryStep(1);
+                setGeneratedCode('');
+                setEnteredCode('');
+                setNewPassword('');
+                setConfirmNewPassword('');
+            } else {
+                Alert.alert('Error', resultado.mensaje || 'No se pudo actualizar la contraseña');
+            }
+        } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
+            Alert.alert('Error', 'Ocurrió un error al actualizar la contraseña');
         }
     }
 
@@ -157,23 +194,67 @@ export default function Login ({ navigation }) {
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalTitle}>Recuperar Contraseña</Text>
-                        <Text style={styles.modalText}>Ingresa tu correo electrónico para recibir instrucciones.</Text>
-                        
-                        <TextInput
-                            style={[styles.input, { width: '100%', marginBottom: 20 }]}
-                            placeholder='ejemplo@gmail.com'
-                            placeholderTextColor='#999'
-                            keyboardType='email-address'
-                            value={recoverEmail}
-                            onChangeText={setRecoverEmail}/>
+                        {recoveryStep === 1 ? (
+                            <>
+                                <Text style={styles.modalText}>Ingresa tu correo electrónico para generar un código local.</Text>
 
-                        <Pressable style={[styles.botonIniciar, { marginBottom: 10, width: '100%' }]} onPress={handleRecuperar}>
-                            <Text style={styles.textoBotonIniciar}>Enviar</Text>
-                        </Pressable>
+                                <TextInput
+                                    style={[styles.input, { width: '100%', marginBottom: 20 }]}
+                                    placeholder='ejemplo@gmail.com'
+                                    placeholderTextColor='#999'
+                                    keyboardType='email-address'
+                                    value={recoverEmail}
+                                    onChangeText={setRecoverEmail}/>
 
-                        <Pressable style={[styles.botonRegistro]} onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={[styles.textoRegistroDestacado, { color: '#FF4444' }]}>Cancelar</Text>
-                        </Pressable>
+                                <Pressable style={[styles.botonIniciar, { marginBottom: 10, width: '100%' }]} onPress={handleRecuperar}>
+                                    <Text style={styles.textoBotonIniciar}>Generar Código</Text>
+                                </Pressable>
+
+                                <Pressable style={[styles.botonRegistro]} onPress={() => { setModalVisible(!modalVisible); setRecoveryStep(1); setGeneratedCode(''); }}>
+                                    <Text style={[styles.textoRegistroDestacado, { color: '#FF4444' }]}>Cancelar</Text>
+                                </Pressable>
+                            </>
+                        ) : (
+                            <>
+                                <Text style={styles.modalText}>Código generado:</Text>
+                                <Text style={[styles.modalText, { fontWeight: '700', fontSize: 18, color: '#1103AB' }]}>{generatedCode}</Text>
+
+                                <TextInput
+                                    style={[styles.input, { width: '100%', marginBottom: 10 }]}
+                                    placeholder='Ingresa el código'
+                                    placeholderTextColor='#999'
+                                    keyboardType='number-pad'
+                                    value={enteredCode}
+                                    onChangeText={setEnteredCode}
+                                />
+
+                                <TextInput
+                                    style={[styles.input, { width: '100%', marginBottom: 10 }]}
+                                    placeholder='Nueva contraseña'
+                                    placeholderTextColor='#999'
+                                    secureTextEntry={true}
+                                    value={newPassword}
+                                    onChangeText={setNewPassword}
+                                />
+
+                                <TextInput
+                                    style={[styles.input, { width: '100%', marginBottom: 20 }]}
+                                    placeholder='Confirmar nueva contraseña'
+                                    placeholderTextColor='#999'
+                                    secureTextEntry={true}
+                                    value={confirmNewPassword}
+                                    onChangeText={setConfirmNewPassword}
+                                />
+
+                                <Pressable style={[styles.botonIniciar, { marginBottom: 10, width: '100%' }]} onPress={handleVerificarYCambiar}>
+                                    <Text style={styles.textoBotonIniciar}>Verificar y Cambiar</Text>
+                                </Pressable>
+
+                                <Pressable style={[styles.botonRegistro]} onPress={() => { setModalVisible(!modalVisible); setRecoveryStep(1); setGeneratedCode(''); setEnteredCode(''); setNewPassword(''); setConfirmNewPassword(''); }}>
+                                    <Text style={[styles.textoRegistroDestacado, { color: '#FF4444' }]}>Cancelar</Text>
+                                </Pressable>
+                            </>
+                        )}
                     </View>
                 </View>
             </Modal>

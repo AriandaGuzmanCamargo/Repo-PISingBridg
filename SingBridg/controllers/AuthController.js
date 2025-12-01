@@ -1,8 +1,10 @@
-import { insertarUsuario, buscarUsuarioPorEmail, verificarCredenciales } from '../database/database';
+import { insertarUsuario, buscarUsuarioPorEmail, verificarCredenciales, actualizarPassword } from '../database/database';
 import Usuario from '../models/Usuario';
 
 // Controlador de Autenticación
 export class AuthController {
+    // Map para almacenar códigos de recuperación en memoria (solo local)
+    static _recoveryCodes = new Map();
     
     // Registrar nuevo usuario
     static async registrarUsuario(nombre, email, password, confirmPassword) {
@@ -147,6 +149,77 @@ export class AuthController {
                 exito: false,
                 mensaje: 'Error al verificar el email'
             };
+        }
+    }
+
+    // Generar código de recuperación local (no envía correo)
+    static async generarCodigoRecuperacionLocal(email) {
+        try {
+            if (!Usuario.validarEmail(email)) {
+                return { exito: false, mensaje: 'Por favor ingrese un email válido' };
+            }
+
+            const usuarios = await buscarUsuarioPorEmail(email.toLowerCase().trim());
+            if (!usuarios || usuarios.length === 0) {
+                return { exito: false, mensaje: 'Email no registrado' };
+            }
+
+            // Generar código numérico de 6 dígitos
+            const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+            const expiracion = Date.now() + 15 * 60 * 1000; // 15 minutos
+
+            // Guardar en map (clave: email en minúsculas)
+            AuthController._recoveryCodes.set(email.toLowerCase().trim(), { codigo, expiracion });
+
+            return { exito: true, mensaje: 'Código generado localmente', codigo };
+        } catch (error) {
+            console.error('Error en generarCodigoRecuperacionLocal:', error);
+            return { exito: false, mensaje: 'Error al generar código de recuperación' };
+        }
+    }
+
+    // Verificar código y cambiar la contraseña localmente
+    static async verificarCodigoYCambiar(email, codigoIngresado, nuevaPassword) {
+        try {
+            if (!Usuario.validarEmail(email)) {
+                return { exito: false, mensaje: 'Por favor ingrese un email válido' };
+            }
+
+            if (!Usuario.validarPassword(nuevaPassword)) {
+                return { exito: false, mensaje: 'La contraseña debe tener al menos 6 caracteres' };
+            }
+
+            const key = email.toLowerCase().trim();
+            const registro = AuthController._recoveryCodes.get(key);
+            if (!registro) {
+                return { exito: false, mensaje: 'No hay un código activo para este email' };
+            }
+
+            if (Date.now() > registro.expiracion) {
+                AuthController._recoveryCodes.delete(key);
+                return { exito: false, mensaje: 'El código ha expirado. Genera uno nuevo.' };
+            }
+
+            if (registro.codigo !== codigoIngresado) {
+                return { exito: false, mensaje: 'Código incorrecto' };
+            }
+
+            // Obtener usuario y actualizar contraseña
+            const usuarios = await buscarUsuarioPorEmail(key);
+            if (!usuarios || usuarios.length === 0) {
+                return { exito: false, mensaje: 'Usuario no encontrado' };
+            }
+
+            const usuario = usuarios[0];
+            await actualizarPassword(usuario.id, nuevaPassword);
+
+            // Eliminar código usado
+            AuthController._recoveryCodes.delete(key);
+
+            return { exito: true, mensaje: 'Contraseña actualizada correctamente' };
+        } catch (error) {
+            console.error('Error en verificarCodigoYCambiar:', error);
+            return { exito: false, mensaje: 'Error al actualizar la contraseña' };
         }
     }
 }
