@@ -37,7 +37,7 @@ export default function Dashboard({ navigation }) {
             id: 1,
             titulo: 'Alfabeto en Señas',
             descripcion: 'Aprende el alfabeto completo',
-            icono: '',
+            imagen: require('../assets/alfabeto.png'),
             color: '#2B5DA2',
             pantalla: 'Diccionario'
         },
@@ -45,7 +45,7 @@ export default function Dashboard({ navigation }) {
             id: 2,
             titulo: 'Traductor',
             descripcion: 'Traduce texto a señas',
-            icono: '',
+            imagen: require('../assets/traducir.png'),
             color: '#4FC3F7',
             pantalla: 'traductor'
         },
@@ -53,7 +53,7 @@ export default function Dashboard({ navigation }) {
             id: 3,
             titulo: 'Letras',
             descripcion: 'Detalles de cada letra',
-            icono: '',
+            imagen: require('../assets/computadora-con-signos-de-letras-flotantes.png'),
             color: '#1F3A5F',
             pantalla: 'DetalleLetra'
         },
@@ -61,7 +61,7 @@ export default function Dashboard({ navigation }) {
             id: 4,
             titulo: 'Vocabulario',
             descripcion: 'Palabras básicas en señas',
-            icono: '',
+            imagen: require('../assets/vocabulario.png'),
             color: '#A2BCD6',
             pantalla: 'vocabulario'
         },
@@ -94,7 +94,7 @@ export default function Dashboard({ navigation }) {
                             style={[styles.tarjetaSeccion, { backgroundColor: seccion.color }]}
                             onPress={() => navigation.navigate(seccion.pantalla)}
                         >
-                            <Text style={styles.seccionIcono}>{seccion.icono}</Text>
+                            <Image source={seccion.imagen} style={styles.imagenSeccion} />
                             <Text style={styles.seccionTitulo2}>{seccion.titulo}</Text>
                             <Text style={styles.seccionDescripcion}>{seccion.descripcion}</Text>
                         </Pressable>
@@ -203,6 +203,14 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 4,
         minHeight: 140,
+        alignItems: 'center',
+    },
+    imagenSeccion: {
+        width: 50,
+        height: 50,
+        resizeMode: 'contain',
+        marginBottom: 10,
+        tintColor: '#FFFFFF',
     },
     seccionIcono: {
         fontSize: 32,
@@ -213,6 +221,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FFFFFF',
         marginBottom: 5,
+        textAlign: 'center',
     },
     seccionDescripcion: {
         fontSize: 12,
