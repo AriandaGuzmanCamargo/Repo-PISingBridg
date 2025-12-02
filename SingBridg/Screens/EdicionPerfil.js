@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
-import { eliminarUsuarioPorEmail, buscarUsuarioPorEmail, actualizarUsuario, verificarCredenciales, actualizarPassword} from '../database/database';
+import { eliminarUsuarioPorEmail, buscarUsuarioPorEmail, actualizarUsuario, verificarCredenciales } from '../database/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -141,44 +141,13 @@ export default function EdicionPerfil({ navigation }) {
     };
 
 
-    const handleActualizarContrasena = async () => {
-       if(!validarCambioContrasena()) return;
-       try{
-           if (!usuarioId || !correoOriginal) {
-               Alert.alert('Error', 'No se pudo identificar al usuario actual.');
-               return;
-           }
-
-           if (!contrasena.trim()) {
-               Alert.alert('Error', 'Ingresa tu contraseña actual en el formulario principal para confirmar el cambio.');
-               return;
-           }
-
-           const usuarioValido =await verificarCredenciales(
-               correoOriginal.toLowerCase().trim(),
-               contrasena
-           );
-
-           if (!usuarioValido) {
-               Alert.alert('Error', 'La contraseña actual no es correcta.');
-               return;
-           }
-
-           await actualizarPassword(usuarioId, nuevaContrasena.trim());
-
-           setNuevaContrasena('');
-           setConfirmarContrasena('');
-           setContrasena('');
-           setMostrar(null);
-
-           Alert.alert('Éxito', 'Contraseña actualizada correctamente');
-
-       }catch(error){
-
-           console.error('Error al actualizar contraseña:', error);
-           Alert.alert('Error', 'No se pudo actualizar la contraseña. Intenta de nuevo.');
-
-       }
+    const handleActualizarContrasena = () => {
+        if (validarCambioContrasena()) {
+            Alert.alert('Éxito', 'Contraseña actualizada correctamente');
+            setNuevaContrasena('');
+            setConfirmarContrasena('');
+            setMostrar(null);
+        }
     };
 
     const handleCerrarSesion = () => {
@@ -367,17 +336,6 @@ export default function EdicionPerfil({ navigation }) {
                             value={confirmarContrasena}
                             onChangeText={setConfirmarContrasena}
                             placeholder="Confirma tu contraseña"
-                        />
-
-                        <Text style={styles.etiqueta2}>
-                            Ingrese su contraseña para confirmar
-                        </Text>
-                        <TextInput
-                            style={styles.input2}
-                            secureTextEntry={true}
-                            value={contrasena}
-                            onChangeText={setContrasena}
-                            placeholder="Contraseña actual"
                         />
 
                         <Pressable style={styles.botonConfirmar} onPress={handleActualizarContrasena}>

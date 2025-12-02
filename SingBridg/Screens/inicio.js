@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#e4e4e4ff',
-        paddingTop: 30,
     },
     titulocontainer: {
         backgroundColor: '#1F3A5F',

@@ -1,26 +1,9 @@
 import { Text, StyleSheet, View, ScrollView, Pressable, Image } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Dashboard({ navigation }) {
     const [selectedTab, setSelectedTab] = useState('home');
-    const [nombreUsuario, setNombreUsuario] = useState('Usuario');
-    
-    useEffect(() => {
-        const cargarUsuario = async () => {
-            try {
-                const data = await AsyncStorage.getItem('usuario');
-                if (data) {
-                    const usuario = JSON.parse(data);
-                    setNombreUsuario(usuario.nombre);
-                }
-            } catch (error) {
-                console.log('Error cargando usuario desde AsyncStorage:', error);
-            }
-        };
-        cargarUsuario();
-    }, []);
     
     const handleTabChange = (tab) => {
         setSelectedTab(tab);
@@ -31,39 +14,34 @@ export default function Dashboard({ navigation }) {
         }
     };
 
-    // Secciones del Dashboard
-    const secciones = [
+    // Datos de ejemplo de cursos
+    const cursos = [
         {
             id: 1,
             titulo: 'Alfabeto en Señas',
-            descripcion: 'Aprende el alfabeto completo',
-            imagen: require('../assets/alfabeto.png'),
-            color: '#2B5DA2',
+            nivel: 'Básico',
+            progreso: 65,
+            imagen: require('../assets/Logo.png'),
+            color: '#4CAF50',
             pantalla: 'Diccionario'
         },
         {
             id: 2,
             titulo: 'Traductor',
-            descripcion: 'Traduce texto a señas',
-            imagen: require('../assets/traducir.png'),
-            color: '#4FC3F7',
+            nivel: 'Básico',
+            progreso: 30,
+            imagen: require('../assets/Logo.png'),
+            color: '#9E9E9E',
             pantalla: 'traductor'
         },
         {
             id: 3,
             titulo: 'Letras',
-            descripcion: 'Detalles de cada letra',
-            imagen: require('../assets/computadora-con-signos-de-letras-flotantes.png'),
-            color: '#1F3A5F',
-            pantalla: 'DetalleLetra'
-        },
-        {
-            id: 4,
-            titulo: 'Vocabulario',
-            descripcion: 'Palabras básicas en señas',
-            imagen: require('../assets/vocabulario.png'),
-            color: '#A2BCD6',
-            pantalla: 'vocabulario'
+            nivel: 'Intermedio',
+            progreso: 15,
+            imagen: require('../assets/usuario.png'),
+            color: '#2196F3',
+                pantalla: 'DetalleLetra'
         },
     ];
     
@@ -73,39 +51,65 @@ export default function Dashboard({ navigation }) {
                 {/* Header */}
                 <View style={styles.headerContainer}>
                     <View style={styles.headerCard}>
-                        <Text style={styles.headerTitle}>Dashboard</Text>
+                        <Text style={styles.headerTitle}>Cursos</Text>
                         <Image source={require('../assets/Logo.png')} style={styles.headerLogo} />
                     </View>
                 </View>
 
-                {/* Mensaje de Bienvenida */}
-                <View style={styles.bienvenidaContainer}>
-                    <Text style={styles.bienvenidaTitulo}>¡Bienvenido, {nombreUsuario}! </Text>
-                    <Text style={styles.bienvenidaTexto}>Explora y aprende lenguaje de señas</Text>
+                {/* Tarjeta de Progreso General */}
+                <View style={styles.tarjetaProgreso}>
+                    <View style={styles.progresoIcono}>
+                        <Text style={styles.iconoGrafico}>📊</Text>
+                    </View>
+                    <Text style={styles.progresoTitulo}>Progreso General</Text>
+                    <View style={styles.estadisticas}>
+                        <View style={styles.estadItem}>
+                            <Text style={styles.estadNumero}>3</Text>
+                            <Text style={styles.estadLabel}>Cursos</Text>
+                        </View>
+                        <View style={styles.estadItem}>
+                            <Text style={styles.estadNumero}>48%</Text>
+                            <Text style={styles.estadLabel}>Completado</Text>
+                        </View>
+                        <View style={styles.estadItem}>
+                            <Text style={styles.estadNumero}>12</Text>
+                            <Text style={styles.estadLabel}>Días</Text>
+                        </View>
+                    </View>
                 </View>
 
-                {/* Sección Dashboard */}
-                <Text style={styles.seccionTitulo}>Explora</Text>
+                {/* Sección Mis Cursos */}
+                <Text style={styles.seccionTitulo}>Mis Cursos</Text>
 
-                <View style={styles.gridContainer}>
-                    {secciones.map((seccion) => (
-                        <Pressable 
-                            key={seccion.id}
-                            style={[styles.tarjetaSeccion, { backgroundColor: seccion.color }]}
-                            onPress={() => navigation.navigate(seccion.pantalla)}
-                        >
-                            <Image source={seccion.imagen} style={styles.imagenSeccion} />
-                            <Text style={styles.seccionTitulo2}>{seccion.titulo}</Text>
-                            <Text style={styles.seccionDescripcion}>{seccion.descripcion}</Text>
-                        </Pressable>
-                    ))}
-                </View>
-
-                <View style={styles.tarjetaMotivacion}>
-                    <Text style={styles.motivacionIcono}>🎯</Text>
-                    <Text style={styles.motivacionTitulo}>Sigue Practicando</Text>
-                    <Text style={styles.motivacionTexto}>Cada día es una oportunidad para aprender algo nuevo</Text>
-                </View>
+                {/* Lista de Cursos */}
+                {cursos.map((curso) => (
+                    <Pressable 
+                        key={curso.id}
+                        style={styles.tarjetaCurso}
+                        onPress={() => navigation.navigate(curso.pantalla)}
+                    >
+                        <Image 
+                            source={curso.imagen}
+                            style={[styles.cursoImagen, { backgroundColor: curso.color }]}
+                            resizeMode="cover"
+                        />
+                        <View style={styles.cursoInfo}>
+                            <Text style={styles.cursoTitulo}>{curso.titulo}</Text>
+                            <Text style={styles.cursoNivel}>{curso.nivel}</Text>
+                            <View style={styles.progresoContainer}>
+                                <View style={styles.progresoFondo}>
+                                    <View 
+                                        style={[
+                                            styles.progresoRelleno, 
+                                            { width: `${curso.progreso}%` }
+                                        ]} 
+                                    />
+                                </View>
+                                <Text style={styles.progresoTexto}>{curso.progreso}%</Text>
+                            </View>
+                        </View>
+                    </Pressable>
+                ))}
 
             </ScrollView>
             
@@ -155,107 +159,113 @@ const styles = StyleSheet.create({
         height: 40,
         resizeMode: 'contain',
     },
-    bienvenidaContainer: {
-        backgroundColor: '#FFFFFF',
+    tarjetaProgreso: {
+        backgroundColor: '#2B5DA2',
         marginHorizontal: 20,
         marginTop: 20,
         marginBottom: 10,
         borderRadius: 15,
         padding: 20,
+        position: 'relative',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.2,
         shadowRadius: 4,
-        elevation: 3,
+        elevation: 4,
     },
-    bienvenidaTitulo: {
+    progresoIcono: {
+        position: 'absolute',
+        top: 15,
+        right: 15,
+    },
+    iconoGrafico: {
+        fontSize: 24,
+    },
+    progresoTitulo: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        marginBottom: 20,
+    },
+    estadisticas: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    estadItem: {
+        alignItems: 'center',
+    },
+    estadNumero: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#2B5DA2',
-        marginBottom: 8,
+        color: '#FFFFFF',
     },
-    bienvenidaTexto: {
-        fontSize: 14,
-        color: '#666',
+    estadLabel: {
+        fontSize: 12,
+        color: '#B3D4FF',
+        marginTop: 5,
     },
     seccionTitulo: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '600',
         color: '#000',
         marginHorizontal: 20,
         marginTop: 20,
         marginBottom: 15,
     },
-    gridContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+    tarjetaCurso: {
+        backgroundColor: '#FFFFFF',
         marginHorizontal: 20,
-        justifyContent: 'space-between',
-    },
-    tarjetaSeccion: {
-        width: '48%',
-        borderRadius: 15,
-        padding: 20,
         marginBottom: 15,
+        borderRadius: 12,
+        flexDirection: 'row',
+        padding: 12,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 4,
-        minHeight: 140,
-        alignItems: 'center',
-    },
-    imagenSeccion: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
-        marginBottom: 10,
-        tintColor: '#FFFFFF',
-    },
-    seccionIcono: {
-        fontSize: 32,
-        marginBottom: 10,
-    },
-    seccionTitulo2: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 5,
-        textAlign: 'center',
-    },
-    seccionDescripcion: {
-        fontSize: 12,
-        color: '#FFFFFF',
-        opacity: 0.9,
-    },
-    tarjetaMotivacion: {
-        backgroundColor: '#E3F2FD',
-        marginHorizontal: 20,
-        marginTop: 10,
-        borderRadius: 15,
-        padding: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        borderLeftWidth: 4,
-        borderLeftColor: '#2B5DA2',
+        shadowRadius: 3,
+        elevation: 2,
     },
-    motivacionIcono: {
-        fontSize: 40,
-        marginBottom: 10,
+    cursoImagen: {
+        width: 70,
+        height: 70,
+        borderRadius: 10,
     },
-    motivacionTitulo: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2B5DA2',
+    cursoInfo: {
+        flex: 1,
+        marginLeft: 15,
+        justifyContent: 'center',
+    },
+    cursoTitulo: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
+        marginBottom: 4,
+    },
+    cursoNivel: {
+        fontSize: 13,
+        color: '#4FC3F7',
         marginBottom: 8,
     },
-    motivacionTexto: {
-        fontSize: 14,
-        color: '#666',
-        textAlign: 'center',
+    progresoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    progresoFondo: {
+        flex: 1,
+        height: 6,
+        backgroundColor: '#E0E0E0',
+        borderRadius: 3,
+        overflow: 'hidden',
+        marginRight: 10,
+    },
+    progresoRelleno: {
+        height: '100%',
+        backgroundColor: '#4FC3F7',
+        borderRadius: 3,
+    },
+    progresoTexto: {
+        fontSize: 12,
+        color: '#999',
+        width: 35,
     },
 })

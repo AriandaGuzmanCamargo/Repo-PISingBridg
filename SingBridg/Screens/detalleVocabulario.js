@@ -1,7 +1,6 @@
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, Dimensions } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
 
 const { width } = Dimensions.get('window');
@@ -21,22 +20,10 @@ export default function DetallePalabra({ navigation, route }) {
     const letra = palabra.charAt(0).toUpperCase();
     const indicaciones = "Se estira el dedo índice; luego, se hace un movimiento de encoger y de estirar.";
 
-    const [selectedTab, setSelectedTab] = useState('home');
-    const [status, setStatus] = useState({});
-    const videoRef = useRef(null);
+    const [selectedTab, setSelectedTab] = React.useState('home');
 
     const handleTabChange = (tab) => {
         setSelectedTab(tab);
-    };
-    
-    const togglePlayPause = async () => {
-        if (videoRef.current) {
-            if (status.isPlaying) {
-                await videoRef.current.pauseAsync();
-            } else {
-                await videoRef.current.playAsync();
-            }
-        }
     };
 
     return (
@@ -74,27 +61,19 @@ export default function DetallePalabra({ navigation, route }) {
                             source={require('../assets/agua.png')} 
                             style={styles.mediaPlaceholder}
                         />
+                        
                     </View>
                     
                     {/* Video */}
-                    <Pressable style={styles.mediaCard} onPress={togglePlayPause}>
-                        <Video
-                            ref={videoRef}
-                            style={styles.video}
-                            source={{
-                                uri: 'https://www.w3schools.com/html/mov_bbb.mp4', // URL de ejemplo - reemplaza con tu video
-                            }}
-                            useNativeControls={false}
-                            resizeMode={ResizeMode.CONTAIN}
-                            isLooping
-                            onPlaybackStatusUpdate={status => setStatus(() => status)}
+                    <View style={styles.mediaCard}>
+                         <Image 
+                            source={{ uri: 'https://placehold.co/150x150/d1d1d1/000000?text=VIDEO+DE+SEÑA' }} 
+                            style={styles.mediaPlaceholder}
                         />
-                        {!status.isPlaying && (
-                            <View style={styles.playOverlay}>
-                                <Text style={styles.playIcon}>▶</Text>
-                            </View>
-                        )}
-                    </Pressable>
+                        <View style={styles.playOverlay}>
+                             <Text style={styles.playIcon}>▶</Text>
+                        </View>
+                    </View>
                 </View>
 
                 {/* Indicaciones */}
@@ -213,23 +192,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
         elevation: 4,
-        overflow: 'hidden',
-    },
-    video: {
-        width: '100%',
-        height: '100%',
-    },
-    playOverlay: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    playIcon: {
-        fontSize: 40,
-        color: COLORES.blanco,
     },
     mediaPlaceholder: {
         width: '100%',

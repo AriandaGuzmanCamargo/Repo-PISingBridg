@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
-import { initDatabase, buscarPalabra, insertarPalabra } from './database/database';
-import imagenes from './utils/imagenes';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { initDatabase } from './database/database';
 
 import Inicio from './Screens/inicio';
 import Login from './Screens/login';
@@ -23,31 +22,10 @@ export default function App() {
   const [dbInicializada, setDbInicializada] = useState(false);
 
   useEffect(() => {
-    // Inicializar la base de datos solo en plataformas nativas
-    if (Platform.OS === 'web') {
-      console.log('⚠️ Base de datos deshabilitada en web');
-      setDbInicializada(true);
-      return;
-    }
-    
     // Inicializar la base de datos al cargar la app
     initDatabase()
       .then(() => {
         console.log('✅ Base de datos inicializada correctamente');
-        // Poblar la tabla `diccionario` con las imágenes disponibles si no existen
-        const keys = Object.keys(imagenes || {});
-        keys.forEach((filename) => {
-          const palabra = filename.replace(/\.[^/.]+$/, '').toLowerCase();
-          buscarPalabra(palabra).then((res) => {
-            if (!res || res.length === 0) {
-              insertarPalabra(palabra, 'Descripción no disponible', filename).catch((e) => {
-                console.log('Error insertando palabra seed', palabra, e);
-              });
-            }
-          }).catch((e) => {
-            console.log('Error comprobando palabra seed', palabra, e);
-          });
-        });
         setDbInicializada(true);
       })
       .catch(error => {
