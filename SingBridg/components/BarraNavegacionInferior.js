@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Pressable, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function BarraNavegacionInferior({ selectedTab, onTabChange }) {
+export default function BarraNavegacionInferior({ selectedTab = 'home', onTabChange = () => {} }) {
     const navigation = useNavigation();
 
     return (
