@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput, Dimensions } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
 import imagenes from '../utils/imagenes';  
+import descripciones from '../utils/descripciones';
 import { obtenerLetrasSeñas } from '../utils/alfabeto';
-import iaService from '../services/iaService';
 
 const { width } = Dimensions.get('window');
 const COLORES = {
@@ -59,9 +59,6 @@ export default function Traductor({ navigation }) {
   const [resultado, setResultado] = useState([]);
   const [selectedTab, setSelectedTab] = useState('traductor');
   const [sugerencias, setSugerencias] = useState([]);
-  const [guiaIA, setGuiaIA] = useState('');
-  const [explicacionActual, setExplicacionActual] = useState('');
-  const [cargandoIA, setCargandoIA] = useState(false);
 
   const normalize = (s) => {
     if (!s) return '';
@@ -81,17 +78,18 @@ export default function Traductor({ navigation }) {
     return imagenKey;
   };
 
-  const traducirTexto = async (texto) => {
+  const buscarDescripcion = (palabraNormalizada) => {
+    // Buscar descripción en el diccionario
+    return descripciones[palabraNormalizada] || null;
+  };
+
+  const traducirTexto = (texto) => {
     const textoNormalizado = normalize(texto);
     
     if (!textoNormalizado) {
       setResultado([]);
-      setGuiaIA('');
-      setExplicacionActual('');
       return;
     }
-
-    setCargandoIA(true);
 
     // Buscar frase completa
     let palabrasParaTraducir = [];
@@ -104,11 +102,13 @@ export default function Traductor({ navigation }) {
 
     const resultadosPalabras = palabrasParaTraducir.map(palabra => {
       const imagen = buscarImagen(palabra);
+      const descripcion = buscarDescripcion(palabra);
       
       if (imagen) {
         return {
           palabra: palabra,
           imagen: imagen,
+          descripcion: descripcion,
           encontrado: true,
           tipo: 'seña'
         };
@@ -125,21 +125,6 @@ export default function Traductor({ navigation }) {
     });
 
     setResultado(resultadosPalabras);
-
-    // Obtener guía de IA
-    try {
-      const palabrasConSena = resultadosPalabras.filter(r => r.tipo === 'seña').map(r => r.palabra);
-      const palabrasDeletreo = resultadosPalabras.filter(r => r.tipo === 'deletreo').map(r => r.palabra);
-      
-      const guia = await iaService.obtenerGuiaFrase(texto, palabrasConSena, palabrasDeletreo);
-      setGuiaIA(guia);
-    } catch (error) {
-      console.log('⚠️ Error obteniendo guía:', error.message);
-      // Mostrar guía básica sin mostrar error al usuario
-      setGuiaIA('Realiza cada seña de forma clara y secuencial. Las palabras deletreadas deben hacerse letra por letra con pausas entre cada palabra.');
-    }
-
-    setCargandoIA(false);
   };
 
   const generarSugerencias = (texto) => {
@@ -182,21 +167,6 @@ export default function Traductor({ navigation }) {
     setTextoEntrada('');
     setResultado([]);
     setSugerencias([]);
-    setGuiaIA('');
-    setExplicacionActual('');
-  };
-
-  const obtenerExplicacionPalabra = async (palabra) => {
-    setCargandoIA(true);
-    try {
-      const explicacion = await iaService.obtenerExplicacionSena(palabra, textoEntrada);
-      setExplicacionActual(explicacion);
-    } catch (error) {
-      console.log('⚠️ Error:', error.message);
-      // Mostrar explicación local sin error intrusivo
-      setExplicacionActual(iaService.obtenerExplicacionLocal(palabra));
-    }
-    setCargandoIA(false);
   };
 
   return (
@@ -310,14 +280,6 @@ export default function Traductor({ navigation }) {
                           ))}
                         </ScrollView>
                       </View>
-                      <Pressable 
-                        style={estilos.botonExplicacion}
-                        onPress={() => obtenerExplicacionPalabra(item.palabra)}
-                      >
-                        <Text style={estilos.textoBotonExplicacion}>
-                          💡 Ver cómo hacer esta seña
-                        </Text>
-                      </Pressable>
                     </>
                   ) : (
                     <View style={estilos.itemNoEncontrado}>
@@ -332,10 +294,25 @@ export default function Traductor({ navigation }) {
           </View>
         </View>
 
+        {/* Descripciones de las señas */}
+        {resultado.some(item => item.tipo === 'seña' && item.descripcion) && (
+          <View style={estilos.seccionDescripciones}>
+            <Text style={estilos.tituloSeccionDescripciones}>📖 Descripciones</Text>
+            {resultado.map((item, index) => (
+              item.tipo === 'seña' && item.descripcion ? (
+                <View key={`desc-${index}`} style={estilos.contenedorDescripcionSeña}>
+                  <Text style={estilos.tituloDescripcionSeña}>💡 {item.palabra}:</Text>
+                  <Text style={estilos.textoDescripcionSeña}>{item.descripcion}</Text>
+                </View>
+              ) : null
+            ))}
+          </View>
+        )}
+
         {/* Información de ayuda */}
         {resultado.length === 0 && textoEntrada.length === 0 && (
           <View style={estilos.contenedorAyuda}>
-            <Text style={estilos.tituloAyuda}>💡 Prueba escribir:</Text>
+            <Text style={estilos.tituloAyuda}>Prueba escribir:</Text>
             <View style={estilos.listaEjemplos}>
               {['hola', 'gracias', 'por favor', 'hoy no puedo', 'mama', 'papa', 'agua', 'comida'].map((ejemplo, index) => (
                 <Pressable 
@@ -355,44 +332,8 @@ export default function Traductor({ navigation }) {
           <View style={estilos.contenedorEstadisticas}>
             <Text style={estilos.textoEstadistica}>
               ✓ {resultado.filter(r => r.tipo === 'seña').length} señas específicas • 
-              📝 {resultado.filter(r => r.tipo === 'deletreo').length} palabras a deletrear
+               {resultado.filter(r => r.tipo === 'deletreo').length} palabras a deletrear
             </Text>
-          </View>
-        )}
-
-        {/* Guía de IA */}
-        {guiaIA && !cargandoIA && (
-          <View style={estilos.contenedorGuiaIA}>
-            <View style={estilos.headerGuia}>
-              <Text style={estilos.iconoGuia}>🤖</Text>
-              <Text style={estilos.tituloGuia}>Guía de IA</Text>
-            </View>
-            <Text style={estilos.textoGuia}>{guiaIA}</Text>
-          </View>
-        )}
-
-        {/* Explicación actual */}
-        {explicacionActual && (
-          <View style={estilos.contenedorExplicacion}>
-            <View style={estilos.headerExplicacion}>
-              <Text style={estilos.iconoExplicacion}>💡</Text>
-              <Text style={estilos.tituloExplicacion}>Cómo hacer la seña</Text>
-            </View>
-            <Text style={estilos.textoExplicacion}>{explicacionActual}</Text>
-            <Pressable 
-              style={estilos.botonCerrarExplicacion}
-              onPress={() => setExplicacionActual('')}
-            >
-              <Text style={estilos.textoCerrarExplicacion}>Cerrar</Text>
-            </Pressable>
-          </View>
-        )}
-
-        {/* Indicador de carga IA */}
-        {cargandoIA && (
-          <View style={estilos.contenedorCargando}>
-            <ActivityIndicator size="small" color={COLORES.azulBoton} />
-            <Text style={estilos.textoCargando}>Consultando IA...</Text>
           </View>
         )}
       </ScrollView>
@@ -681,18 +622,6 @@ const estilos = StyleSheet.create({
         color: COLORES.azulFuerte,
         marginTop: 3,
     },
-    botonExplicacion: {
-        backgroundColor: COLORES.azulIntermedio,
-        borderRadius: 8,
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        marginTop: 10,
-    },
-    textoBotonExplicacion: {
-        fontSize: 13,
-        color: COLORES.blanco,
-        fontWeight: '600',
-    },
     itemNoEncontrado: {
         alignItems: 'center',
         padding: 15,
@@ -751,88 +680,51 @@ const estilos = StyleSheet.create({
         color: COLORES.azulFuerte,
         fontWeight: '500',
     },
-    contenedorGuiaIA: {
-        backgroundColor: '#E8F5E9',
-        borderRadius: 10,
-        padding: 15,
-        marginTop: 15,
-        borderLeftWidth: 4,
-        borderLeftColor: '#4CAF50',
-    },
-    headerGuia: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    iconoGuia: {
-        fontSize: 20,
-        marginRight: 8,
-    },
-    tituloGuia: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#2E7D32',
-    },
-    textoGuia: {
-        fontSize: 14,
-        color: '#1B5E20',
-        lineHeight: 20,
-    },
-    contenedorExplicacion: {
-        backgroundColor: '#FFF9C4',
-        borderRadius: 10,
-        padding: 15,
-        marginTop: 15,
-        borderLeftWidth: 4,
-        borderLeftColor: '#FBC02D',
-    },
-    headerExplicacion: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    iconoExplicacion: {
-        fontSize: 20,
-        marginRight: 8,
-    },
-    tituloExplicacion: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#F57F17',
-    },
-    textoExplicacion: {
-        fontSize: 14,
-        color: '#F57F17',
-        lineHeight: 20,
-        marginBottom: 10,
-    },
-    botonCerrarExplicacion: {
-        backgroundColor: COLORES.azulBoton,
-        borderRadius: 8,
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        alignSelf: 'center',
-        marginTop: 5,
-    },
-    textoCerrarExplicacion: {
-        fontSize: 13,
-        color: COLORES.blanco,
-        fontWeight: '600',
-    },
-    contenedorCargando: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+    seccionDescripciones: {
         backgroundColor: COLORES.blanco,
-        borderRadius: 8,
+        borderRadius: 15,
         padding: 15,
         marginTop: 15,
+        shadowColor: COLORES.negro,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 3,
     },
-    textoCargando: {
+    tituloSeccionDescripciones: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORES.azulFuerte,
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    contenedorDescripcionSeña: {
+        backgroundColor: '#F0F8FF',
+        borderRadius: 10,
+        padding: 15,
+        marginTop: 10,
+        borderLeftWidth: 4,
+        borderLeftColor: COLORES.azulBoton,
+    },
+    tituloDescripcionSeña: {
         fontSize: 14,
-        color: COLORES.azulBoton,
-        marginLeft: 10,
-        fontWeight: '500',
+        fontWeight: 'bold',
+        color: COLORES.azulFuerte,
+        marginBottom: 5,
+    },
+    textoDescripcionSeña: {
+        fontSize: 13,
+        color: '#333',
+        lineHeight: 18,
+    },
+    descripcionSeña: {
+        fontSize: 13,
+        color: '#555',
+        marginTop: 8,
+        paddingHorizontal: 10,
+        textAlign: 'center',
+        fontStyle: 'italic',
+        lineHeight: 18,
     },
     contenedorDescripcion: {
         backgroundColor: COLORES.blanco,
