@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput, Dimensions } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
-import imagenes from '../utils/imagenes';   // mapa de imágenes con require()
-import { buscarPalabra } from '../database'; // consulta a SQLite
+import imagenes from '../utils/imagenes';  
+import { buscarPalabra } from '../database/database'; 
 
 const { width } = Dimensions.get('window');
 const COLORES = {
