@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput, Dimensions } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
 import imagenes from '../utils/imagenes';  
-import { buscarPalabra } from '../database/database'; 
+import descripciones from '../utils/descripciones';
 
 const { width } = Dimensions.get('window');
 const COLORES = {
@@ -20,17 +20,28 @@ export default function Traductor({ navigation }) {
   const [resultado, setResultado] = useState(null);
   const [selectedTab, setSelectedTab] = useState('traductor');
 
-  // Buscar palabra en SQLite cada vez que cambia el texto
+  const normalize = (s) => {
+    if (!s) return '';
+    return s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/\s+/g, '')
+      .replace(/[^a-z0-9]/g, '');
+  };
+
+  
   useEffect(() => {
-    const palabra = textoEntrada.trim().toLowerCase();
-    if (palabra !== '') {
-      buscarPalabra(palabra).then((res) => {
-        if (res.length > 0) {
-          setResultado(res[0]); // { palabra, descripcion, imagen }
-        } else {
-          setResultado(null);
-        }
-      });
+    const palabra = textoEntrada || '';
+    const normPalabra = normalize(palabra.trim().toLowerCase());
+    if (normPalabra !== '') {
+      const imagenKey = Object.keys(imagenes).find((k) => normalize(k.replace('.png', '')) === normPalabra);
+      const descripcionFija = descripciones[normPalabra] || null;
+      if (imagenKey || descripcionFija) {
+        setResultado({ palabra, imagen: imagenKey || null, descripcion: descripcionFija });
+      } else {
+        setResultado(null);
+      }
     } else {
       setResultado(null);
     }
@@ -92,7 +103,7 @@ export default function Traductor({ navigation }) {
           <View style={estilos.columnaMedio}>
             <Text style={estilos.tituloMedio}>Señas</Text>
             <View style={estilos.tarjetaSalida}>
-              {resultado && (
+              {resultado && resultado.imagen && (
                 <Image 
                   source={imagenes[resultado.imagen]} 
                   style={estilos.imagenSeña}
@@ -103,11 +114,11 @@ export default function Traductor({ navigation }) {
         </View>
 
         {/* Descripción */}
-        {resultado && (
+        {resultado && (resultado.descripcion || resultado.imagen) && (
           <View style={estilos.contenedorDescripcion}>
             <Text style={estilos.tituloDescripcion}>Descripción</Text>
             <Text style={estilos.textoDescripcion}>
-              {resultado.descripcion}
+              {resultado.descripcion ? resultado.descripcion : 'No hay descripción disponible.'}
             </Text>
           </View>
         )}
