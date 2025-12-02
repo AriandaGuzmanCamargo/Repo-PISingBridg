@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, Dimensions } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior'; 
+import VIDEOS_DICCIONARIO from '../utils/videos';
 
 const { width } = Dimensions.get('window');
 
@@ -19,11 +20,28 @@ const COLORES = {
 export default function DetallePalabra({ navigation, route }) {
     const { palabra, imagen, descripcion } = route.params || {};
 
-    // 2. CORRECCIÓN: Definir la variable 'letra' para que no de error
-    // Si hay palabra, tomamos la primera letra, si no, dejamos cadena vacía
-    const letra = palabra ? palabra.charAt(0).toUpperCase() : '';
+    // Obtener el video correspondiente a la palabra
+    const obtenerVideo = (palabra) => {
+        if (!palabra) return null;
+        
+        let nombreLimpio = palabra.toLowerCase();
+        let clave = `${nombreLimpio}.mp4`;
+        
+        if (VIDEOS_DICCIONARIO[clave]) {
+            return VIDEOS_DICCIONARIO[clave];
+        }
+        
+        // Intentar sin la ñ (por si acaso)
+        let claveSinEnie = nombreLimpio.replace(/ñ/g, 'n') + '.mp4';
+        if (VIDEOS_DICCIONARIO[claveSinEnie]) {
+            return VIDEOS_DICCIONARIO[claveSinEnie];
+        }
+        
+        return null;
+    };
 
-    // 3. DEFINIR INDICACIONES
+    const videoSource = obtenerVideo(palabra);
+    const letra = palabra ? palabra.charAt(0).toUpperCase() : '';
     const indicaciones = descripcion || "Sin indicaciones disponibles.";
     
 
@@ -85,20 +103,26 @@ export default function DetallePalabra({ navigation, route }) {
                     
                     {/* Video */}
                     <Pressable style={styles.mediaCard} onPress={togglePlayPause}>
-                        <Video
-                            ref={videoRef}
-                            style={styles.video}
-                            source={{
-                                uri: 'https://www.w3schools.com/html/mov_bbb.mp4', // URL de ejemplo - reemplaza con tu video
-                            }}
-                            useNativeControls={false}
-                            resizeMode={ResizeMode.CONTAIN}
-                            isLooping
-                            onPlaybackStatusUpdate={status => setStatus(() => status)}
-                        />
-                        {!status.isPlaying && (
-                            <View style={styles.playOverlay}>
-                                <Text style={styles.playIcon}>▶</Text>
+                        {videoSource ? (
+                            <>
+                                <Video
+                                    ref={videoRef}
+                                    style={styles.video}
+                                    source={videoSource}
+                                    useNativeControls={false}
+                                    resizeMode={ResizeMode.CONTAIN}
+                                    isLooping
+                                    onPlaybackStatusUpdate={status => setStatus(() => status)}
+                                />
+                                {!status.isPlaying && (
+                                    <View style={styles.playOverlay}>
+                                        <Text style={styles.playIcon}>▶</Text>
+                                    </View>
+                                )}
+                            </>
+                        ) : (
+                            <View style={styles.noVideoContainer}>
+                                <Text style={styles.noVideoText}>Video no disponible</Text>
                             </View>
                         )}
                     </Pressable>
@@ -259,5 +283,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         lineHeight: 24,
+    },
+    noVideoContainer: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORES.grisMedio,
+    },
+    noVideoText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
     },
 });
