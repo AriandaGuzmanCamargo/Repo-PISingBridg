@@ -45,18 +45,17 @@ export default function Diccionario({ navigation }) {
         }
     };
 
-    // Función para navegar al vocabulario con la letra seleccionada
-    const irAVocabulario = (letra) => {
-        // Encontrar el índice de la letra en el abecedario
+    // Función para navegar al detalle de letra
+    const irADetalleLetra = (letra) => {
+        // Encontrar el índice de la letra 
         const ABECEDARIO = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
         const indice = ABECEDARIO.indexOf(letra);
         
-        // Navegar a vocabulario con el índice de la letra
-        navigation.navigate('vocabulario', { indiceLetra: indice >= 0 ? indice : 0 });
+        navigation.navigate('DetalleLetra', { indiceLetra: indice >= 0 ? indice : 0 });
     };
 
     const renderItem = ({ item }) => (
-        <Pressable style={styles.itemContainer} onPress={() => irAVocabulario(item.letter)}>
+        <Pressable style={styles.itemContainer} onPress={() => irADetalleLetra(item.letter)}>
             <View style={styles.imageWrapper}>
                 <Image source={item.img} style={styles.signImage} />
             </View>

@@ -1,6 +1,6 @@
 export default {
   "abajo.png": require("../assets/SIGN_IMAGES/abajo.png"),
-  "acompanado.png": require("../assets/SIGN_IMAGES/acompanado.png"),
+  "acompañado.png": require("../assets/SIGN_IMAGES/acompañado.png"),
   "aqui.png": require("../assets/SIGN_IMAGES/aqui.png"),
   "balon.png": require("../assets/SIGN_IMAGES/balon.png"),
   "bondad.png": require("../assets/SIGN_IMAGES/bondad.png"),

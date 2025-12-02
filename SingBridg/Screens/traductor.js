@@ -18,7 +18,7 @@ const COLORES = {
 export default function Traductor({ navigation }) {
   const [textoEntrada, setTextoEntrada] = useState('');
   const [resultado, setResultado] = useState(null);
-  const [selectedTab, setSelectedTab] = useState('home');
+  const [selectedTab, setSelectedTab] = useState('traductor');
 
   // Buscar palabra en SQLite cada vez que cambia el texto
   useEffect(() => {
@@ -38,7 +38,6 @@ export default function Traductor({ navigation }) {
 
   const handleTabChange = (tab) => {
     setSelectedTab(tab);
-    if (tab === 'home') navigation.navigate(tab);
   };
 
   const handleSwitch = () => {
