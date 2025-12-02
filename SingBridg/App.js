@@ -25,7 +25,7 @@ export default function App() {
   useEffect(() => {
     // Inicializar la base de datos solo en plataformas nativas
     if (Platform.OS === 'web') {
-      console.log('⚠️ Base de datos deshabilitada en web');
+      console.log('Base de datos deshabilitada en web');
       setDbInicializada(true);
       return;
     }
@@ -33,7 +33,7 @@ export default function App() {
     // Inicializar la base de datos al cargar la app
     initDatabase()
       .then(() => {
-        console.log('✅ Base de datos inicializada correctamente');
+        console.log('Base de datos inicializada correctamente');
         // Poblar la tabla `diccionario` con las imágenes disponibles si no existen
         const keys = Object.keys(imagenes || {});
         keys.forEach((filename) => {
@@ -51,7 +51,7 @@ export default function App() {
         setDbInicializada(true);
       })
       .catch(error => {
-        console.error('❌ Error al inicializar la base de datos:', error);
+        console.error('Error al inicializar la base de datos:', error);
         setDbInicializada(true); // Continuar aunque haya error
       });
   }, []);
