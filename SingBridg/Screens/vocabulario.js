@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image } from 'react-native';
 import BarraNavegacionInferior from '../components/BarraNavegacionInferior';
 
+
+import IMAGENES_DICCIONARIO from '../utils/imagenes';
+import DESCRIPCIONES_DICCIONARIO from '../utils/descripciones'; 
+
 const { width } = Dimensions.get('window');
-const ANCHO = width * 0.9;
 
 const COLORES = {
     azulFuerte: '#1F3A5F', 
@@ -12,55 +15,79 @@ const COLORES = {
     grisClaro: '#e4e4e4ff',
 };
 
-// Abecedario completo
 const ABECEDARIO = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-// Vocabulario por letra
 const VOCABULARIO_POR_LETRA = {
-    'A': ['Agua', 'Abrir', 'Alto', 'Ayuda', 'Apetito', 'Amigo', 'Adiós'],
-    'B': ['Bueno', 'Baño', 'Bebé', 'Beber', 'Beso', 'Blanco', 'Bonito'],
-    'C': ['Casa', 'Comida', 'Calor', 'Caminar', 'Cansado', 'Carro', 'Cielo'],
-    'D': ['Día', 'Dolor', 'Dormir', 'Dulce', 'Dinero', 'Diente', 'Derecha'],
-    'E': ['Escuela', 'Enfermo', 'Esperar', 'Estudiar', 'Escribir', 'Escuchar', 'Estrella'],
-    'F': ['Familia', 'Feliz', 'Frío', 'Fuego', 'Fácil', 'Feo', 'Fuerte'],
-    'G': ['Gracias', 'Grande', 'Gato', 'Gustar', 'Gente', 'Guerra', 'Gobierno'],
-    'H': ['Hola', 'Hermano', 'Hambre', 'Hablar', 'Hijo', 'Hermoso', 'Hombre'],
-    'I': ['Iglesia', 'Importante', 'Igual', 'Idea', 'Idioma', 'Ir', 'Izquierda'],
-    'J': ['Jugar', 'Joven', 'Junto', 'Justo', 'Jardín', 'Juego', 'Juntos'],
+    'A': ['Abajo', 'Acompañado', 'Agua', 'Abrir', 'Alto', 'Ayuda', 'Apetito', 'Amigo', 'Adiós', 'Aqui'],
+    'B': ['Balon','Bueno', 'Baño', 'Bebé', 'Beber', 'Beso', 'Blanco', 'Bonito', 'Bondad', 'Bonito'],
+    'C': ['Casa', 'Comida', 'Calor', 'Caminar', 'Cansado', 'Carro','Cerrar', 'Cielo', 'Cual', 'Cuidado'],
+    'D': ['Día', 'Dolor', 'Dormir', 'Dulce', 'Dinero', 'Diente', 'Derecha', 'Diferente', 'Duda', 'Dirigir'],
+    'E': ['Escuela', 'Enfermo', 'Esperar', 'Estudiar', 'Escribir', 'Escuchar', 'Estrella', 'Enojado', 'Entregar', 'Espejo', 'Escalera'],
+    'F': ['Familia', 'Feliz', 'Frío', 'Fuego', 'Fácil', 'Feo', 'Fuerte', 'Favor', 'Fin', 'Foco'],
+    'G': ['Gracias', 'Grande', 'Gato', 'Gustar', 'Gente', 'Guerra', 'Gobierno', 'Golpear', 'Guardar'],
+    'H': ['Hola', 'Hermano', 'Hambre', 'Hablar', 'Hijo', 'Hermoso', 'Hombre', 'Hogar', 'Hacer', 'Horno'],
+    'I': ['Iglesia', 'Importante', 'Igual', 'Idea', 'Idioma', 'Ir', 'Izquierda', 'Invitar', 'Jardin', 'Invierno'],
+    'J': ['Jugar', 'Joven', 'Junto', 'Justo', 'Jardín', 'Juego', 'Juntos', 'Jerga'],
     'K': ['Kilo', 'Kilómetro'],
-    'L': ['Luz', 'Lejos', 'Leer', 'Lento', 'Largo', 'Libro', 'Lindo'],
-    'M': ['Mamá', 'Mañana', 'Más', 'Mejor', 'Menor', 'Mesa', 'Mucho'],
-    'N': ['Niño', 'Noche', 'Nombre', 'Nuevo', 'Nunca', 'Negro', 'Nadie'],
+    'L': ['Luz', 'Lejos', 'Leer', 'Lento', 'Largo', 'Libro', 'Lindo', 'Llave', 'Luna', 'Libre', 'Lampara', 'Licuadora'],
+    'M': ['Mamá', 'Mañana', 'Más', 'Mejor', 'Menor', 'Mesa', 'Mucho', 'Manejar', 'Momentito', 'Mujer'],
+    'N': ['Niño', 'Noche', 'Nombre', 'Nuevo', 'Nunca', 'Negro', 'Nadie', 'Niña', 'No esta'],
     'Ñ': ['Año', 'Niño', 'Señor', 'Mañana'],
-    'O': ['Otro', 'Oír', 'Ojo', 'Olvidar', 'Oro', 'Oscuro', 'Obra'],
-    'P': ['Papá', 'Pequeño', 'Poder', 'Pedir', 'Pensar', 'Palabra', 'Perder'],
-    'Q': ['Querer', 'Quedar', 'Quién', 'Qué', 'Quieto', 'Quitar', 'Queso'],
-    'R': ['Rápido', 'Recordar', 'Rojo', 'Responder', 'Reír', 'Rico', 'Río'],
-    'S': ['Salir', 'Saber', 'Sentir', 'Ser', 'Señor', 'Siempre', 'Solo'],
-    'T': ['Tiempo', 'Tener', 'Trabajo', 'Triste', 'Todo', 'Tarde', 'Tierra'],
-    'U': ['Último', 'Único', 'Usar', 'Útil', 'Uno', 'Unidos', 'Universidad'],
-    'V': ['Ver', 'Verdad', 'Verde', 'Vestir', 'Vez', 'Viejo', 'Vivir'],
-    'W': ['Water'],
-    'X': ['Xilófono'],
-    'Y': ['Yo', 'Ya'],
-    'Z': ['Zapato', 'Zona', 'Zoológico'],
+    'O': ['Otro', 'Oír', 'Ojo', 'Olvidar', 'Oro', 'Oscuro', 'Obra', 'Ojala', 'Otra vez'],
+    'P': ['Papá', 'Pequeño', 'Poder', 'Pedir', 'Pensar', 'Palabra', 'Perder', 'Pasos', 'Pena', 'Persona'],
+    'Q': ['Querer', 'Quedar', 'Quién', 'Qué', 'Quieto', 'Quitar', 'Queso', 'Quinto',],
+    'R': ['Rápido', 'Recordar', 'Rojo', 'Responder', 'Reír', 'Rico', 'Río', 'Radio', 'Rebanar', 'Regresar', 'Resumen'],
+    'S': ['Salir', 'Saber', 'Sentir', 'Ser', 'Señor', 'Siempre', 'Solo', 'Sentar', 'Soltar', 'Soñar'],
+    'T': ['Tiempo', 'Tener', 'Trabajo', 'Triste', 'Todo', 'Tarde', 'Tierra', 'Tienda', 'Tomar', 'Transformar'],
+    'U': ['Último', 'Único', 'Usar', 'Útil', 'Uno', 'Unidos', 'Universidad', 'Untar', 'Urgente'],
+    'V': ['Ver', 'Verdad', 'Verde', 'Vestir', 'Vez', 'Viejo', 'Vivir', 'Valioso', 'Volar'],
+    'W': ['Water', 'Whisky'],
+    'X': ['Xilófono', 'Xapala'],
+    'Y': ['Yo', 'Ya', 'Yucatán'],
+    'Z': ['Zapato', 'Zona', 'Zoológico', 'Zanahoria', 'Zapote'],
 };
 
 
-const ItemVocabulario = ({ palabra, alPresionar }) => (
+const obtenerImagen = (palabra) => {
+    let nombreLimpio = palabra.toLowerCase();
+    let clave = `${nombreLimpio}.png`;
+    if (IMAGENES_DICCIONARIO[clave]) return IMAGENES_DICCIONARIO[clave];
+    
+    let claveSinEnie = nombreLimpio.replace(/ñ/g, 'n') + '.png';
+    if (IMAGENES_DICCIONARIO[claveSinEnie]) return IMAGENES_DICCIONARIO[claveSinEnie];
+
+    return null;
+};
+
+
+const obtenerDescripcion = (palabra) => {
+    let clave = palabra.toLowerCase();
+    clave = clave.replace(/\s+/g, '');
+
+    clave = clave.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    return DESCRIPCIONES_DICCIONARIO[clave] || "Descripción no disponible por el momento.";
+};
+
+const ItemVocabulario = ({ palabra, imagenFuente, alPresionar }) => (
     <Pressable style={styles.contenedorItem} onPress={alPresionar}>
-        <Text style={styles.textoPalabra}>{palabra}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {imagenFuente ? (
+                <Image source={imagenFuente} style={styles.imagenPalabra} />
+            ) : (
+                <View style={styles.imagenPlaceholder} />
+            )}
+            <Text style={styles.textoPalabra}>{palabra}</Text>
+        </View>
         <Text style={styles.flecha}>{'>'}</Text>
     </Pressable>
 );
 
-export default function vocabulario({ navigation, route }) {
-    // Recibir el índice de letra desde los parámetros de navegación
+export default function Vocabulario({ navigation, route }) {
     const indiceInicial = route.params?.indiceLetra ?? 0;
     const [indiceLetra, setIndiceLetra] = useState(indiceInicial);
     const [selectedTab, setSelectedTab] = useState('home');
     
-    // Actualizar el índice si cambian los parámetros
     useEffect(() => {
         if (route.params?.indiceLetra !== undefined) {
             setIndiceLetra(route.params.indiceLetra);
@@ -74,48 +101,39 @@ export default function vocabulario({ navigation, route }) {
         setSelectedTab(tab);
     };
 
-    // Navegar a la letra anterior
     const irLetraAnterior = () => {
-        if (indiceLetra > 0) {
-            setIndiceLetra(indiceLetra - 1);
-        }
+        if (indiceLetra > 0) setIndiceLetra(indiceLetra - 1);
     };
 
-    // Navegar a la letra siguiente
     const irLetraSiguiente = () => {
-        if (indiceLetra < ABECEDARIO.length - 1) {
-            setIndiceLetra(indiceLetra + 1);
-        }
+        if (indiceLetra < ABECEDARIO.length - 1) setIndiceLetra(indiceLetra + 1);
     };
 
-    const manejarDetallePalabra = (palabra) => {
-        console.log(`Navegando al detalle de: ${palabra}`);
-        navigation.navigate('detalleVocabulario', { palabra:palabra });
+    const manejarDetallePalabra = (palabra, imagen, descripcion) => {
+        navigation.navigate('detalleVocabulario', { 
+            palabra: palabra,
+            imagen: imagen,
+            descripcion: descripcion 
+        });
     };
 
     return(
         <View style={styles.contenedorPrincipal}>
-            {/* Header tipo Diccionario */}
             <View style={styles.headerContainer}>
                 <View style={styles.headerCard}>
                     <Pressable onPress={() => navigation.goBack()} style={styles.botonAtras}>
                         <Text style={styles.textoBotonAtras}>←</Text>
                     </Pressable>
-                    <Text style={styles.headerTitle}>Vocabulario - Letra {letraActual}</Text>
+                    <Text style={styles.headerTitle}>Vocabulario - {letraActual}</Text>
                     <Image source={require('../assets/Logo.png')} style={styles.headerLogo} />
                 </View>
             </View>
 
-          
             <ScrollView style={styles.vistaDesplazableContenido} contentContainerStyle={styles.scrollContent}>
                 
-              
                 <View style={styles.navegacionLetra}>
                     <Pressable 
-                        style={[
-                            styles.botonNavLetra, 
-                            indiceLetra === 0 && styles.botonDeshabilitado
-                        ]}
+                        style={[styles.botonNavLetra, indiceLetra === 0 && styles.botonDeshabilitado]}
                         onPress={irLetraAnterior}
                         disabled={indiceLetra === 0}
                     >
@@ -123,10 +141,7 @@ export default function vocabulario({ navigation, route }) {
                     </Pressable>
                     <Text style={styles.letraActual}>{letraActual}</Text>
                     <Pressable 
-                        style={[
-                            styles.botonNavLetra,
-                            indiceLetra === ABECEDARIO.length - 1 && styles.botonDeshabilitado
-                        ]}
+                        style={[styles.botonNavLetra, indiceLetra === ABECEDARIO.length - 1 && styles.botonDeshabilitado]}
                         onPress={irLetraSiguiente}
                         disabled={indiceLetra === ABECEDARIO.length - 1}
                     >
@@ -134,18 +149,23 @@ export default function vocabulario({ navigation, route }) {
                     </Pressable>
                 </View>
 
-                <Text style={styles.tituloLista}>Interfaz del vocabulario básico</Text>
+                <Text style={styles.tituloLista}>Diccionario de Señas</Text>
 
-               
                 <View style={styles.contenedorLista}>
                     {palabrasActuales.length > 0 ? (
-                        palabrasActuales.map((palabra, indice) => (
-                            <ItemVocabulario 
-                                key={indice} 
-                                palabra={palabra} 
-                                alPresionar={() => manejarDetallePalabra(palabra)}
-                            />
-                        ))
+                        palabrasActuales.map((palabra, indice) => {
+                            const imgSource = obtenerImagen(palabra);
+                            const descTexto = obtenerDescripcion(palabra);
+                            
+                            return (
+                                <ItemVocabulario 
+                                    key={indice} 
+                                    palabra={palabra} 
+                                    imagenFuente={imgSource}
+                                    alPresionar={() => manejarDetallePalabra(palabra, imgSource, descTexto)}
+                                />
+                            );
+                        })
                     ) : (
                         <View style={styles.sinPalabras}>
                             <Text style={styles.textoSinPalabras}>
@@ -157,7 +177,6 @@ export default function vocabulario({ navigation, route }) {
 
             </ScrollView>
             
-            {/* Barra de navegación inferior */}
             <BarraNavegacionInferior 
                 selectedTab={selectedTab} 
                 onTabChange={handleTabChange}
@@ -179,7 +198,7 @@ const styles = StyleSheet.create({
     headerCard: {
         backgroundColor: '#FFFFFF',
         borderRadius: 15,
-        paddingVertical: 20,
+        paddingVertical: 15, 
         paddingHorizontal: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -190,34 +209,32 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 3,
     },
-    botonAtras: {
-        padding: 5,
-        marginRight: 10,
+    botonAtras: { 
+        padding: 5, 
+        marginRight: 10 
     },
-    textoBotonAtras: {
-        fontSize: 28,
-        color: '#000',
-        fontWeight: 'bold',
+    textoBotonAtras: { 
+        fontSize: 28, 
+        color: '#000', 
+        fontWeight: 'bold' 
     },
-    headerTitle: {
-        fontSize: 22,
-        fontWeight: '600',
-        color: '#000',
+    headerTitle: { 
+        fontSize: 20, 
+        fontWeight: '600', 
+        color: '#000' 
     },
-    headerLogo: {
-        width: 40,
-        height: 40,
-        resizeMode: 'contain',
+    headerLogo: { 
+        width: 40, 
+        height: 40, 
+        resizeMode: 'contain' 
     },
-    vistaDesplazableContenido: {
-        flex: 1,
-        padding: 15,
+    vistaDesplazableContenido: { 
+        flex: 1, 
+        padding: 15 
     },
-    scrollContent: {
-        paddingBottom: 100,
+    scrollContent: { 
+        paddingBottom: 100 
     },
-    
-    
     navegacionLetra: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -236,26 +253,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    botonDeshabilitado: {
-        backgroundColor: '#94A3B8',
-        opacity: 0.5,
+    botonDeshabilitado: { 
+        backgroundColor: '#94A3B8', 
+        opacity: 0.5 
     },
-    textoNavLetra: {
-        color: COLORES.blanco,
-        fontSize: 20,
-        fontWeight: 'bold',
+    textoNavLetra: { 
+        color: COLORES.blanco, 
+        fontSize: 20, 
+        fontWeight: 'bold' 
     },
-    letraActual: {
-        color: COLORES.blanco,
-        fontSize: 36,
-        fontWeight: 'bold',
+    letraActual: { 
+        color: COLORES.blanco, 
+        fontSize: 36, 
+        fontWeight: 'bold' 
     },
-    
-    tituloLista: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 10,
-        fontWeight: '500',
+    tituloLista: { 
+        fontSize: 16, 
+        color: '#666', 
+        marginBottom: 10, 
+        fontWeight: '500' 
     },
     contenedorLista: {
         backgroundColor: COLORES.blanco,
@@ -265,32 +281,47 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 3,
+        overflow: 'hidden'
     },
     contenedorItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
+        paddingVertical: 10, 
+        paddingHorizontal: 15,
         borderBottomWidth: 1,
         borderBottomColor: COLORES.grisClaro,
+    },
+    imagenPalabra: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        marginRight: 15,
+        resizeMode: 'cover',
+    },
+    imagenPlaceholder: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        marginRight: 15,
+        backgroundColor: '#eee',
     },
     textoPalabra: {
         fontSize: 18,
         color: '#333',
         fontWeight: '500',
     },
-    flecha: {
-        fontSize: 20,
-        color: COLORES.azulFuerte,
+    flecha: { 
+        fontSize: 20, 
+        color: COLORES.azulFuerte 
     },
-    sinPalabras: {
-        padding: 30,
-        alignItems: 'center',
+    sinPalabras: { 
+        padding: 30, 
+        alignItems: 'center' 
     },
-    textoSinPalabras: {
-        fontSize: 16,
-        color: '#999',
-        textAlign: 'center',
+    textoSinPalabras: { 
+        fontSize: 16, 
+        color: '#999', 
+        textAlign: 'center' 
     },
 });

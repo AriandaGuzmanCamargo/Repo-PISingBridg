@@ -1,5 +1,7 @@
 
 const descripciones = {
+    agua : "Se estira el índice, y se señala hacia adelante, simulando el flujo del agua.",
+    abrir : "Se colocan las manos tocándose por la punta de los dedos, y se mueven al mismo tiempo a los lados, hasta separarse",
     abajo : "Se estira el índice, y se señala hacia abajo.",
     acompanado : "Se coloca una letra c sobre el otro brazo,tocándolo con la parte lateral del dedo meñique, y se realiza un movimiento de medio círculo hacia la muñeca.",
     aqui : "Con la mano cerrada y el índice estirado se señala el piso.",

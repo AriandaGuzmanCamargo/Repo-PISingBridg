@@ -17,9 +17,15 @@ const COLORES = {
 };
 
 export default function DetallePalabra({ navigation, route }) {
-    const palabra = (route.params || {}).palabra || 'Agua';
-    const letra = palabra.charAt(0).toUpperCase();
-    const indicaciones = "Se estira el dedo índice; luego, se hace un movimiento de encoger y de estirar.";
+    const { palabra, imagen, descripcion } = route.params || {};
+
+    // 2. CORRECCIÓN: Definir la variable 'letra' para que no de error
+    // Si hay palabra, tomamos la primera letra, si no, dejamos cadena vacía
+    const letra = palabra ? palabra.charAt(0).toUpperCase() : '';
+
+    // 3. DEFINIR INDICACIONES
+    const indicaciones = descripcion || "Sin indicaciones disponibles.";
+    
 
     const [selectedTab, setSelectedTab] = useState('home');
     const [status, setStatus] = useState({});
@@ -59,7 +65,7 @@ export default function DetallePalabra({ navigation, route }) {
                 
                 <View style={styles.contenedorPalabra}>
                     <View style={styles.palabraCard}>
-                        <Text style={styles.palabraTexto}>{palabra}</Text>
+                        <Text style={styles.palabraTexto}>{palabra || 'Palabra'}    </Text>
                     </View>
                 </View>
                 <View style={styles.contenedorImageVideo}>
@@ -71,8 +77,9 @@ export default function DetallePalabra({ navigation, route }) {
                     {/* Imagen */}
                     <View style={styles.mediaCard}>
                         <Image 
-                            source={require('../assets/agua.png')} 
+                            source={imagen ? imagen : require('../assets/Logo.png')} 
                             style={styles.mediaPlaceholder}
+                            resizeMode="contain"
                         />
                     </View>
                     
