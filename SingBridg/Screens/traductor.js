@@ -262,7 +262,7 @@ export default function Traductor({ navigation }) {
                   ) : item.tipo === 'deletreo' && item.letras ? (
                     <>
                       <View style={estilos.contenedorDeletreo}>
-                        <Text style={estilos.textoDeletreo}>📝 Deletrear:</Text>
+                        <Text style={estilos.textoDeletreo}> Deletrear:</Text>
                         <Text style={estilos.palabraDeletreo}>{item.palabra.toUpperCase()}</Text>
                         <ScrollView 
                           horizontal 
@@ -297,11 +297,11 @@ export default function Traductor({ navigation }) {
         {/* Descripciones de las señas */}
         {resultado.some(item => item.tipo === 'seña' && item.descripcion) && (
           <View style={estilos.seccionDescripciones}>
-            <Text style={estilos.tituloSeccionDescripciones}>📖 Descripciones</Text>
+            <Text style={estilos.tituloSeccionDescripciones}>Descripciones</Text>
             {resultado.map((item, index) => (
               item.tipo === 'seña' && item.descripcion ? (
                 <View key={`desc-${index}`} style={estilos.contenedorDescripcionSeña}>
-                  <Text style={estilos.tituloDescripcionSeña}>💡 {item.palabra}:</Text>
+                  <Text style={estilos.tituloDescripcionSeña}> {item.palabra}:</Text>
                   <Text style={estilos.textoDescripcionSeña}>{item.descripcion}</Text>
                 </View>
               ) : null
